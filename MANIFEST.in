@@ -1,0 +1,3 @@
+include *.md
+recursive-include configs *.json
+recursive-include g2k_lib *py

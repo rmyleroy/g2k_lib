@@ -1,0 +1,7 @@
+{
+    "default": {
+        "bconstraint": "None",
+        "method": "KS",
+        "niter": 1
+    }
+}

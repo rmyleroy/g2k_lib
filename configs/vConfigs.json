@@ -1,0 +1,14 @@
+{
+    "default": {
+        "title": "This is a default title",
+        "xlabel": "This is a label for the x-axis",
+        "ylabel": "The same but for the y-axis",
+        "methods": ["iKS", "iKS Relaxed", "DCT inpainting", "KS"],
+        "bpix": "variable",
+        "niter": 50,
+        "min": 0,
+        "max": 50,
+        "mode": "e",
+        "refs": ["Bzero"]
+    }
+}
