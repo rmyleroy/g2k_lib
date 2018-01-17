@@ -235,7 +235,7 @@ def iterative(method, g1map, g2map, mask, Niter=20, bpix="None", reduced=False, 
         # The maximum value of the DCT transform of the E-mode kappa map
         # is used as the maximum threshold value
         max_threshold = np.max(dct2d(kE))
-    range_ = tqdm(range(1, Niter)) if tqdm_import else range(1, Niter)
+    range_ = tqdm(range(1, Niter + 1)) if tqdm_import else range(1, Niter + 1)
     for i in range_:
         if dilation:
             constraint = generate_constraint(mask, bpix, dilation, i, Niter)
@@ -349,117 +349,6 @@ def compute_errors(computed_kappa_path, gnd_truth_path, output_path=None):
     rr.save()
 
     return Image(np.array([diff, diffB]))
-
-
-def bin2d(x, y, v=None, w=None, npix=None, extent=None, verbose=False, timed=False):
-    """
-        Bin values v according to position (x, y), taking the average of values
-        falling into the same bin. Averages are weighted if w is provided. If
-        v is not given, return the bin count map.
-
-        Bin edges are computed according to npix such that in each dimension,
-        the min (max) position value lies at the center of its first (last) bin.
-
-        Parameters
-        ----------
-            x, y : array_like
-                Position arrays.
-            v : array_like, optional
-                Values to bin, potentially many arrays of len(x) as [v1, v2, ...].
-            w : array_like, optional
-                Weight values for v.
-            npix : int list as [nx, ny], optional
-                If npix = N, use [N, N]. Defaults to [32, 32] if not provided.
-            verbose : bool
-                If true, print details.
-            timed : bool
-                If true, print total time taken.
-
-        Returns
-        -------
-            2d array
-                values v binned into pixels.
-    """
-    start_time = time.time()
-
-    # TODO: verify inputs
-    x = np.atleast_1d(x)
-    y = np.atleast_1d(y)
-    if v is not None:
-        v = np.atleast_1d(v)
-        if len(v.shape) == 1:
-            v = [v]
-    if w is not None:
-        w = np.atleast_1d(w)
-    else:
-        w = np.ones_like(x)
-
-    if npix is not None:
-        npix = map(int, np.atleast_1d(npix))  # Note: map() returns a list and
-        if len(npix) == 2:                    # needs modification for Python3!
-            n = npix
-        elif len(npix) == 1:
-            n = 2 * npix
-        else:
-            print("Invalid npix. Returning None.")
-            return None
-    else:
-        n = [32, 32]
-
-    # Determine 2D space geometry
-    if extent is not None:
-        xlow, xhigh, ylow, yhigh = extent
-    else:
-        ymin, ymax = min(y), max(y)
-        xmin, xmax = min(x), max(x)
-        halfdx = float(xmax - xmin) / (2 * n[0] - 2)
-        halfdy = float(ymax - ymin) / (2 * n[1] - 2)
-        xlow = xmin - halfdx
-        xhigh = xmax + halfdx
-        ylow = ymin - halfdy
-        yhigh = ymax + halfdy
-    xedges = np.linspace(xlow, xhigh, n[0] + 1)
-    yedges = np.linspace(ylow, yhigh, n[1] + 1)
-
-    # For debugging
-    if verbose:
-        print("xmin, xmax:  {0}, {1}".format(xmin, xmax))
-        print("xlow, xhigh: {0}, {1}".format(xlow, xhigh))
-        print("xedges: {}".format(xedges))
-        print("dx size:   {}".format(halfdx * 2))
-        print("ymin, ymax:  {0}, {1}".format(ymin, ymax))
-        print("ylow, yhigh: {0}, {1}".format(ylow, yhigh))
-
-    # Do fast binning on 1D arrays
-    indx = np.digitize(x, xedges) - 1
-    indy = np.digitize(y, yedges) - 1
-    size_1d = n[1] * n[0]
-    ind_1d = indy * n[0] + indx
-
-    if v is None:
-        # Determine pixel counts and return
-        nmap = np.bincount(ind_1d, minlength=size_1d)
-        if timed:
-            print("Time: {0:.3f} s".format(time.time() - start_time))
-        return nmap.reshape(n[1], n[0])
-
-    # Weight sums map
-    wmap = np.bincount(ind_1d, weights=w, minlength=size_1d)
-    # Avoid division by zero in empty pixels
-    nmap = np.copy(wmap)  # TODO Can we do this without copying ?
-    nmap[wmap == 0] = 1
-    # Compute binned v maps
-    vmaps = [np.bincount(ind_1d, weights=(v[i] * w), minlength=size_1d) / nmap
-             for i in range(len(v))]
-    if len(vmaps) == 1:
-        binnedmap = np.reshape(vmaps[0], (n[1], n[0]))
-    else:
-        binnedmap = np.reshape(vmaps, (len(v), n[1], n[0]))
-
-    if timed:
-        print("Time: {0:.3f} s".format(time.time() - start_time))
-
-    return binnedmap
 
 
 def ks93(g1map, g2map):
