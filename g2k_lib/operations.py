@@ -11,7 +11,7 @@ import copy
 import time
 
 try:
-    from tqdm import *  # To display progression bars
+    from tqdm import tqdm  # To display progression bars
 except ImportError:
     print("module 'tqdm' not installed.")
     tqdm_import = False
@@ -238,10 +238,10 @@ def iterative(method, g1map, g2map, mask, Niter=20, bpix="None", reduced=False, 
     range_ = tqdm(range(1, Niter + 1)) if tqdm_import else range(1, Niter + 1)
     for i in range_:
         if dilation:
-            constraint = generate_constraint(mask, bpix, dilation, i, Niter)
+            constraint = generate_constraint(mask, bpix, dilation, i, Niter + 1)
         next_kE, next_kB = next_step_gradient(
             kE, kB, g1map, g2map, mask, reduced)
-        kE, kB = projection(method, next_kE, next_kB, i, Niter,
+        kE, kB = projection(method, next_kE, next_kB, i, Niter + 1,
                             max_threshold, min_threshold, constraint, mask)
     return kE, kB
 
