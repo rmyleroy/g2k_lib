@@ -1,0 +1,7 @@
+g2k\_lib\.metrics module
+========================
+
+.. automodule:: g2k_lib.metrics
+    :members:
+    :undoc-members:
+    :show-inheritance:

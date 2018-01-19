@@ -1,0 +1,22 @@
+g2k\_lib package
+================
+
+Submodules
+----------
+
+.. toctree::
+
+   g2k_lib.dct_interpolation
+   g2k_lib.metrics
+   g2k_lib.objects
+   g2k_lib.operations
+   g2k_lib.projection_methods
+   g2k_lib.visuals
+
+Module contents
+---------------
+
+.. automodule:: g2k_lib
+    :members:
+    :undoc-members:
+    :show-inheritance:

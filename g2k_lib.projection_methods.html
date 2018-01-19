@@ -1,0 +1,167 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>g2k_lib.projection_methods module &#8212; g2k_lib 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="g2k_lib.visuals module" href="g2k_lib.visuals.html" />
+    <link rel="prev" title="g2k_lib.operations module" href="g2k_lib.operations.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.visuals.html" title="g2k_lib.visuals module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.operations.html" title="g2k_lib.operations module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">g2k_lib 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="g2k_lib.html" accesskey="U">g2k_lib package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-g2k_lib.projection_methods">
+<span id="g2k-lib-projection-methods-module"></span><h1>g2k_lib.projection_methods module<a class="headerlink" href="#module-g2k_lib.projection_methods" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="g2k_lib.projection_methods.MethodNames">
+<em class="property">class </em><code class="descclassname">g2k_lib.projection_methods.</code><code class="descname">MethodNames</code><a class="headerlink" href="#g2k_lib.projection_methods.MethodNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class gathers all the available method names.</p>
+<dl class="attribute">
+<dt id="g2k_lib.projection_methods.MethodNames.DCT">
+<code class="descname">DCT</code><em class="property"> = 'DCT inpainting'</em><a class="headerlink" href="#g2k_lib.projection_methods.MethodNames.DCT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.projection_methods.MethodNames.FULL_DCT">
+<code class="descname">FULL_DCT</code><em class="property"> = 'full DCT'</em><a class="headerlink" href="#g2k_lib.projection_methods.MethodNames.FULL_DCT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.projection_methods.MethodNames.IKS">
+<code class="descname">IKS</code><em class="property"> = 'iKS'</em><a class="headerlink" href="#g2k_lib.projection_methods.MethodNames.IKS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.projection_methods.MethodNames.IKS_RELAXED">
+<code class="descname">IKS_RELAXED</code><em class="property"> = 'iKS Relaxed'</em><a class="headerlink" href="#g2k_lib.projection_methods.MethodNames.IKS_RELAXED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.projection_methods.MethodNames.KS">
+<code class="descname">KS</code><em class="property"> = 'KS'</em><a class="headerlink" href="#g2k_lib.projection_methods.MethodNames.KS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="g2k_lib.projection_methods.MethodNames.get_names">
+<em class="property">classmethod </em><code class="descname">get_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.projection_methods.MethodNames.get_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of all the available method names.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.projection_methods.dct_inpaint">
+<code class="descclassname">g2k_lib.projection_methods.</code><code class="descname">dct_inpaint</code><span class="sig-paren">(</span><em>next_kE</em>, <em>next_kB</em>, <em>i</em>, <em>Niter</em>, <em>max_threshold</em>, <em>min_threshold</em>, <em>constraint</em>, <em>mask</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.projection_methods.dct_inpaint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.projection_methods.full_dct">
+<code class="descclassname">g2k_lib.projection_methods.</code><code class="descname">full_dct</code><span class="sig-paren">(</span><em>next_kE</em>, <em>next_kB</em>, <em>i</em>, <em>Niter</em>, <em>max_threshold</em>, <em>min_threshold</em>, <em>constraint</em>, <em>mask</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.projection_methods.full_dct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.projection_methods.iks">
+<code class="descclassname">g2k_lib.projection_methods.</code><code class="descname">iks</code><span class="sig-paren">(</span><em>next_kE</em>, <em>next_kB</em>, <em>constraint</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.projection_methods.iks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.projection_methods.iks_relaxed">
+<code class="descclassname">g2k_lib.projection_methods.</code><code class="descname">iks_relaxed</code><span class="sig-paren">(</span><em>next_kE</em>, <em>next_kB</em>, <em>i</em>, <em>Niter</em>, <em>constraint</em>, <em>mask</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.projection_methods.iks_relaxed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="g2k_lib.operations.html"
+                        title="previous chapter">g2k_lib.operations module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="g2k_lib.visuals.html"
+                        title="next chapter">g2k_lib.visuals module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.visuals.html" title="g2k_lib.visuals module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.operations.html" title="g2k_lib.operations module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">g2k_lib 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="g2k_lib.html" >g2k_lib package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Remy Leroy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

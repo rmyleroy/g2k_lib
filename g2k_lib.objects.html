@@ -1,0 +1,332 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>g2k_lib.objects module &#8212; g2k_lib 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="g2k_lib.operations module" href="g2k_lib.operations.html" />
+    <link rel="prev" title="g2k_lib.metrics module" href="g2k_lib.metrics.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.operations.html" title="g2k_lib.operations module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.metrics.html" title="g2k_lib.metrics module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">g2k_lib 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="g2k_lib.html" accesskey="U">g2k_lib package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-g2k_lib.objects">
+<span id="g2k-lib-objects-module"></span><h1>g2k_lib.objects module<a class="headerlink" href="#module-g2k_lib.objects" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="g2k_lib.objects.ComputedKappa">
+<em class="property">class </em><code class="descclassname">g2k_lib.objects.</code><code class="descname">ComputedKappa</code><span class="sig-paren">(</span><em>data</em>, <em>header</em>, <em>filename=''</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.ComputedKappa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#g2k_lib.objects.Image" title="g2k_lib.objects.Image"><code class="xref py py-class docutils literal"><span class="pre">g2k_lib.objects.Image</span></code></a></p>
+<dl class="attribute">
+<dt id="g2k_lib.objects.ComputedKappa.method">
+<code class="descname">method</code><a class="headerlink" href="#g2k_lib.objects.ComputedKappa.method" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Name of the method used to compute kappas, stored in the header</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.ComputedKappa.niter">
+<code class="descname">niter</code><a class="headerlink" href="#g2k_lib.objects.ComputedKappa.niter" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Number of iterations to compute kappas, stored in the header</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.ComputedKappa.bconstraint">
+<code class="descname">bconstraint</code><a class="headerlink" href="#g2k_lib.objects.ComputedKappa.bconstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int or str</em> – Type of constraint applied over B component</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.ComputedKappa.mask_path">
+<code class="descname">mask_path</code><a class="headerlink" href="#g2k_lib.objects.ComputedKappa.mask_path" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Path to the mask image used to compute kappas</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">bconstraint</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">mask_path</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">method</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">niter</code></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="g2k_lib.objects.Config">
+<em class="property">class </em><code class="descclassname">g2k_lib.objects.</code><code class="descname">Config</code><span class="sig-paren">(</span><em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.Config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="g2k_lib.objects.Config.CONF_PATH">
+<code class="descname">CONF_PATH</code><a class="headerlink" href="#g2k_lib.objects.Config.CONF_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>str
+Directory where configuration files MUST be stored</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.Config.DEFAULT_CONF_NAME">
+<code class="descname">DEFAULT_CONF_NAME</code><a class="headerlink" href="#g2k_lib.objects.Config.DEFAULT_CONF_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>str
+Default configuration name used when omitted</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.Config.filename">
+<code class="descname">filename</code><a class="headerlink" href="#g2k_lib.objects.Config.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>str
+Name of the configuration file stored in the configuration directory</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.Config.config">
+<code class="descname">config</code><a class="headerlink" href="#g2k_lib.objects.Config.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict
+Set of (key, value(s))</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">CONF_PATH</code><em class="property"> = './configs/'</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">DEFAULT_CONF_NAME</code><em class="property"> = 'default'</em></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="g2k_lib.objects.Config.from_json">
+<em class="property">classmethod </em><code class="descname">from_json</code><span class="sig-paren">(</span><em>filename</em>, <em>config_name</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.Config.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the keys and values relative to the given configuration name</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="g2k_lib.objects.Config.get_configuration">
+<em class="property">classmethod </em><code class="descname">get_configuration</code><span class="sig-paren">(</span><em>filename</em>, <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.Config.get_configuration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="g2k_lib.objects.Counter">
+<em class="property">class </em><code class="descclassname">g2k_lib.objects.</code><code class="descname">Counter</code><a class="headerlink" href="#g2k_lib.objects.Counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>This is just a counter called when a new plot figure is initialised</p>
+<dl class="attribute">
+<dt id="g2k_lib.objects.Counter.count">
+<code class="descname">count</code><em class="property"> = 0</em><a class="headerlink" href="#g2k_lib.objects.Counter.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="g2k_lib.objects.Image">
+<em class="property">class </em><code class="descclassname">g2k_lib.objects.</code><code class="descname">Image</code><span class="sig-paren">(</span><em>data</em>, <em>header={}</em>, <em>filename=''</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.Image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Object storing array_like data as images</p>
+<dl class="attribute">
+<dt id="g2k_lib.objects.Image.data">
+<code class="descname">data</code><a class="headerlink" href="#g2k_lib.objects.Image.data" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>array_like</em> – Image data</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.Image.header">
+<code class="descname">header</code><a class="headerlink" href="#g2k_lib.objects.Image.header" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – Image meta-data</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.Image.file">
+<code class="descname">file</code><a class="headerlink" href="#g2k_lib.objects.Image.file" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>file</em> – Image file</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.Image.filename">
+<code class="descname">filename</code><a class="headerlink" href="#g2k_lib.objects.Image.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Image file name</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.Image.layers">
+<code class="descname">layers</code><a class="headerlink" href="#g2k_lib.objects.Image.layers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Number of layers into the image file</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="g2k_lib.objects.Image.from_fits">
+<em class="property">classmethod </em><code class="descname">from_fits</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.Image.from_fits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an Image object from data contained into a fits file
+by providing the file’s path, adding a NAME field into the header.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="g2k_lib.objects.Image.get_layer">
+<code class="descname">get_layer</code><span class="sig-paren">(</span><em>layer=0</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.Image.get_layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the image at the given layer (default layer=0)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">layers</code></dt>
+<dd><p>Dimensionality of the image</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="g2k_lib.objects.Image.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>layer=-1</em>, <em>filename=None</em>, <em>**prefs</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.Image.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="g2k_lib.objects.Image.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.Image.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the image into a fits file under the provided file name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="g2k_lib.objects.ResultRegister">
+<em class="property">class </em><code class="descclassname">g2k_lib.objects.</code><code class="descname">ResultRegister</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.ResultRegister" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="g2k_lib.objects.ResultRegister.filename">
+<code class="descname">filename</code><a class="headerlink" href="#g2k_lib.objects.ResultRegister.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>str
+Name of the file where all the results are stored</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="g2k_lib.objects.ResultRegister.data">
+<code class="descname">data</code><a class="headerlink" href="#g2k_lib.objects.ResultRegister.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict
+Dictionary containing all the errors computed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="g2k_lib.objects.ResultRegister.get_error">
+<code class="descname">get_error</code><span class="sig-paren">(</span><em>method</em>, <em>niter</em>, <em>bconstraint</em>, <em>mode='e'</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.ResultRegister.get_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the errors relative to the given configuration</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="g2k_lib.objects.ResultRegister.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.ResultRegister.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store all the values into its file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="g2k_lib.objects.ResultRegister.set_error">
+<code class="descname">set_error</code><span class="sig-paren">(</span><em>method</em>, <em>niter</em>, <em>bconstraint</em>, <em>error</em>, <em>mode='e'</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.objects.ResultRegister.set_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an entry to store the error value, overwrite the entry if already existing</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="g2k_lib.metrics.html"
+                        title="previous chapter">g2k_lib.metrics module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="g2k_lib.operations.html"
+                        title="next chapter">g2k_lib.operations module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.operations.html" title="g2k_lib.operations module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.metrics.html" title="g2k_lib.metrics module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">g2k_lib 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="g2k_lib.html" >g2k_lib package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Remy Leroy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+g2k\_lib\.objects module
+========================
+
+.. automodule:: g2k_lib.objects
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,427 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>g2k_lib.operations module &#8212; g2k_lib 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="g2k_lib.projection_methods module" href="g2k_lib.projection_methods.html" />
+    <link rel="prev" title="g2k_lib.objects module" href="g2k_lib.objects.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.projection_methods.html" title="g2k_lib.projection_methods module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.objects.html" title="g2k_lib.objects module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">g2k_lib 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="g2k_lib.html" accesskey="U">g2k_lib package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-g2k_lib.operations">
+<span id="g2k-lib-operations-module"></span><h1>g2k_lib.operations module<a class="headerlink" href="#module-g2k_lib.operations" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="g2k_lib.operations.compute_errors">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">compute_errors</code><span class="sig-paren">(</span><em>computed_kappa_path</em>, <em>gnd_truth_path</em>, <em>output_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.compute_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates both errors (E and B), then stores the values in the computed kappa header
+and in a global results register.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>computed_kappa_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path toward the computed kappa fits file.</li>
+<li><strong>gnd_truth_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path toward the ground truth map fits file.</li>
+<li><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – Path toward the file in which the results register will be stored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Image of the difference between the computed and the ground truth kappa maps
+for both modes.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="g2k_lib.objects.html#g2k_lib.objects.Image" title="g2k_lib.objects.Image">Image</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.compute_kappa">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">compute_kappa</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.compute_kappa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the computed kappa corresponding to the given configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<a class="reference internal" href="g2k_lib.objects.html#g2k_lib.objects.Config" title="g2k_lib.objects.Config"><em>Config</em></a>) – <dl class="docutils">
+<dt>Must contain the following attributes:</dt>
+<dd><ul class="first last simple">
+<li>gammas : str (path)</li>
+<li>mask : str (path)</li>
+<li>method : str</li>
+<li>niter : int</li>
+<li>bconstraint : int or str</li>
+<li>reduced : bool</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Image with both modes of the computed kappa maps.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="g2k_lib.objects.html#g2k_lib.objects.Image" title="g2k_lib.objects.Image">Image</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.cut_mask">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">cut_mask</code><span class="sig-paren">(</span><em>data</em>, <em>mask</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.cut_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the mask over the data and cut data to get rid of the frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>array_like</em>) – Matrix with values to be extracted.</li>
+<li><strong>mask</strong> (<em>array_like</em>) – Mask and data must have the same shape.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Extracted version of the data matrix.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array_like</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The frame is determined by the outtermost nonzero values.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.generate_constraint">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">generate_constraint</code><span class="sig-paren">(</span><em>mask</em>, <em>bpix</em>, <em>dilation=False</em>, <em>i=None</em>, <em>Niter=None</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.generate_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a constraint matrix to be applied over the B mode;
+it is build using some erosion methods on the given mask.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mask</strong> (<em>array_like</em>) – Mask relative to missing data.</li>
+<li><strong>bpix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Defines the size of the structuring element.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Add documentation regarding the dilation</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The constraint matrix.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array_like</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="go">                        [0, 1, 1, 1, 0],</span>
+<span class="go">                        [0, 1, 1, 1, 0],</span>
+<span class="go">                        [0, 1, 1, 1, 0],</span>
+<span class="go">                        [0, 0, 0, 0, 0]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">generate_constraint</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">array([[0, 0, 0, 0, 0],</span>
+<span class="go">       [0, 0, 0, 0, 0],</span>
+<span class="go">       [0, 0, 1, 0, 0],</span>
+<span class="go">       [0, 0, 0, 0, 0],</span>
+<span class="go">       [0, 0, 0, 0, 0]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.iterative">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">iterative</code><span class="sig-paren">(</span><em>method</em>, <em>g1map</em>, <em>g2map</em>, <em>mask</em>, <em>Niter=20</em>, <em>bpix='None'</em>, <em>reduced=False</em>, <em>dilation=False</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.iterative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iteratively computes next kappa maps according to the given method
+and the number of iterations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Name of the methode to compute kappa maps.</li>
+<li><strong>g1map</strong> (<em>array_like</em>) – Gamma E-mode.</li>
+<li><strong>g2map</strong> (<em>array_like</em>) – Gamma B-mode.</li>
+<li><strong>mask</strong> (<em>array_like</em>) – Missing data mask.</li>
+<li><strong>Niter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) – Total number of iteration to perform the reconstruction.</li>
+<li><strong>bpix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – Number of pixel that caracterise the erosion to generate the constraint matrix.
+No constraint if set to <code class="docutils literal"><span class="pre">&quot;None&quot;</span></code> (default).
+Constraint over the entire image if set to <code class="docutils literal"><span class="pre">&quot;Bzero&quot;</span></code>.</li>
+<li><strong>reduced</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If set <code class="docutils literal"><span class="pre">True</span></code>, <code class="docutils literal"><span class="pre">g1map</span></code> and <code class="docutils literal"><span class="pre">g2map</span></code> are considered as reduced shear maps,
+else they are considered as observed shear maps (default).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Both (E and B) computed kappa.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple of array_like</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.k2g_fits">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">k2g_fits</code><span class="sig-paren">(</span><em>k_path</em>, <em>g_path</em>, <em>mask_path=None</em>, <em>noise_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.k2g_fits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes gamma maps from kappa maps in fits file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>k_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path to the kappa map fits file.</li>
+<li><strong>g_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path to save the gamma map fits file.</li>
+<li><strong>mask_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) – Path to the mask map fits file.</li>
+<li><strong>noise_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Path to the noise map fits file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>The noise is added to the gamma maps.</dt>
+<dd><ul class="first last">
+<li>If the noise fits file contains only one noise map,the noise will be added to both gamma maps.</li>
+<li>Else (2 noise maps) the first (resp. second) willbe added to the first (res. second) gamma map.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li>The mask is applied over each gamma map.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.ks93">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">ks93</code><span class="sig-paren">(</span><em>g1map</em>, <em>g2map</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.ks93" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Kaiser-Squires inversion mass map from binned gamma maps.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>g2map</strong> (<em>g1map</em><em>,</em>) – binned gamma maps.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">E-mode and B-mode kappa maps.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">tuple of array_like</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#g2k_lib.operations.ks93inv" title="g2k_lib.operations.ks93inv"><code class="xref py py-func docutils literal"><span class="pre">ks93inv()</span></code></a></dt>
+<dd>Invers of ks93 function.</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.ks93inv">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">ks93inv</code><span class="sig-paren">(</span><em>kEmap</em>, <em>kBmap</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.ks93inv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute inverse Kaiser-Squires from E-mode and B-mode kappa maps.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kBmap</strong> (<em>kEmap</em><em>,</em>) – binned kappa maps.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">E-mode and B-mode gamma maps.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">tuple of array_like</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#g2k_lib.operations.ks93" title="g2k_lib.operations.ks93"><code class="xref py py-func docutils literal"><span class="pre">ks93()</span></code></a></dt>
+<dd>Invers of ks93inv function.</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.next_step_gradient">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">next_step_gradient</code><span class="sig-paren">(</span><em>kE</em>, <em>kB</em>, <em>g1map</em>, <em>g2map</em>, <em>mask</em>, <em>reduced</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.next_step_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the gradient and evaluates the next kappa values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>kE</strong> (<em>array_like</em>) – Current kappa E-mode.</li>
+<li><strong>kB</strong> (<em>array_like</em>) – Current kappa B-mode.</li>
+<li><strong>g1map</strong> (<em>array_like</em>) – Gamma E-mode.</li>
+<li><strong>g2map</strong> (<em>array_like</em>) – Gamma B-mode.</li>
+<li><strong>mask</strong> (<em>array_like</em>) – Missing data mask.</li>
+<li><strong>reduced</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – If set <code class="docutils literal"><span class="pre">True</span></code>, <code class="docutils literal"><span class="pre">g1map</span></code> and <code class="docutils literal"><span class="pre">g2map</span></code> are considered as reduced shear maps,
+else they are considered as observed shear maps.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Both mode (E and B) of the next kappa maps.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple of array_like</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.operations.projection">
+<code class="descclassname">g2k_lib.operations.</code><code class="descname">projection</code><span class="sig-paren">(</span><em>method</em>, <em>next_kE</em>, <em>next_kB</em>, <em>i</em>, <em>Niter</em>, <em>max_threshold</em>, <em>min_threshold</em>, <em>constraint</em>, <em>mask</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.operations.projection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the correct projection of kappa maps according to the given method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Name of the method used to compute kappa maps.</li>
+<li><strong>next_kE</strong> (<em>array_like</em>) – Kappa E-mode map to be projected.</li>
+<li><strong>next_kB</strong> (<em>array_like</em>) – Kappa B-mode map to be projected.</li>
+<li><strong>i</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Current iteration number.</li>
+<li><strong>Niter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Total number of iteration.</li>
+<li><strong>max_threshold</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – Maximum threshold value to be used for the DCT.</li>
+<li><strong>min_threshold</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) – Minimum threshold value to be used for the DCT.</li>
+<li><strong>constraint</strong> (<em>array_like</em>) – Constraint matrix.</li>
+<li><strong>mask</strong> (<em>array_like</em>) – Missing data mask.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Projected kappa maps (both E and B mode).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">tuple of array_like</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> – Raised in case of unexpected method value.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="g2k_lib.objects.html"
+                        title="previous chapter">g2k_lib.objects module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="g2k_lib.projection_methods.html"
+                        title="next chapter">g2k_lib.projection_methods module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.projection_methods.html" title="g2k_lib.projection_methods module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.objects.html" title="g2k_lib.objects module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">g2k_lib 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="g2k_lib.html" >g2k_lib package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Remy Leroy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

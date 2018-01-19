@@ -1,0 +1,7 @@
+g2k\_lib\.projection\_methods module
+====================================
+
+.. automodule:: g2k_lib.projection_methods
+    :members:
+    :undoc-members:
+    :show-inheritance:

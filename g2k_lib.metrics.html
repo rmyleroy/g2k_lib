@@ -1,0 +1,168 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>g2k_lib.metrics module &#8212; g2k_lib 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="g2k_lib.objects module" href="g2k_lib.objects.html" />
+    <link rel="prev" title="g2k_lib.dct_interpolation module" href="g2k_lib.dct_interpolation.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.objects.html" title="g2k_lib.objects module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.dct_interpolation.html" title="g2k_lib.dct_interpolation module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">g2k_lib 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="g2k_lib.html" accesskey="U">g2k_lib package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-g2k_lib.metrics">
+<span id="g2k-lib-metrics-module"></span><h1>g2k_lib.metrics module<a class="headerlink" href="#module-g2k_lib.metrics" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="g2k_lib.metrics.get_error">
+<code class="descclassname">g2k_lib.metrics.</code><code class="descname">get_error</code><span class="sig-paren">(</span><em>num</em>, <em>denom</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.metrics.get_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a percentage ratio between the two given array_like parameters
+according to their standard deviation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>num</strong> (<em>array_like</em>) – The numerator.</li>
+<li><strong>denom</strong> (<em>array_like</em>) – The denominator.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The percentage ratio.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="g2k_lib.metrics.norm">
+<code class="descclassname">g2k_lib.metrics.</code><code class="descname">norm</code><span class="sig-paren">(</span><em>x</em>, <em>L=2</em><span class="sig-paren">)</span><a class="headerlink" href="#g2k_lib.metrics.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the L-norm of a matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>array_like</em>) – The matrix whose norm wants to be computed.</li>
+<li><strong>L</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em> or </em><em>numpy.inf</em>) – <dl class="docutils">
+<dt>The order of the norm:</dt>
+<dd><ul class="first last">
+<li>L=0 : returns the amount of non zero values in x.</li>
+<li>L=numpy.inf : returns the maximum value in x.</li>
+<li>else : standard L-th norm.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The computed norm.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="g2k_lib.dct_interpolation.html"
+                        title="previous chapter">g2k_lib.dct_interpolation module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="g2k_lib.objects.html"
+                        title="next chapter">g2k_lib.objects module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.objects.html" title="g2k_lib.objects module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.dct_interpolation.html" title="g2k_lib.dct_interpolation module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">g2k_lib 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="g2k_lib.html" >g2k_lib package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Remy Leroy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

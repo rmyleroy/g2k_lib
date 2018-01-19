@@ -1,0 +1,205 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>g2k_lib’s documentation &#8212; g2k_lib 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="g2k_lib package" href="g2k_lib.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.html" title="g2k_lib package"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">g2k_lib 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="g2k-lib-s-documentation">
+<h1>g2k_lib’s documentation<a class="headerlink" href="#g2k-lib-s-documentation" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Version:</th><td class="field-body">0.0.1</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Author:</th><td class="field-body">Remy Leroy</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Date:</th><td class="field-body">Jan. 2018</td>
+</tr>
+</tbody>
+</table>
+<p>This module aims to provide several methods to compute iteratively convergence maps from shear maps under FITS format.</p>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>You can either install it as a regular package by typing <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> in a shell</li>
+</ul>
+<p><strong>OR</strong></p>
+<ul class="simple">
+<li>just install all the dependencies listed in <cite>requirements.txt</cite> using the following command: <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code></li>
+</ul>
+</div>
+<div class="section" id="contents">
+<h1>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="g2k_lib.html">g2k_lib package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="g2k_lib.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="g2k_lib.dct_interpolation.html">g2k_lib.dct_interpolation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="g2k_lib.metrics.html">g2k_lib.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="g2k_lib.objects.html">g2k_lib.objects module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="g2k_lib.operations.html">g2k_lib.operations module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="g2k_lib.projection_methods.html">g2k_lib.projection_methods module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="g2k_lib.visuals.html">g2k_lib.visuals module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="g2k_lib.html#module-g2k_lib">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="features">
+<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<p>This package contains an executable pyton file <cite>run.py</cite> that allows the user to perform several actions which are:
+* Computation of convergence maps by calling the <code class="docutils literal"><span class="pre">compute</span></code> action.
+* Evaluation of the error with respect to a reference convergence map by calling the <code class="docutils literal"><span class="pre">evaluate</span></code> action.
+* Plot error curves by calling the <code class="docutils literal"><span class="pre">visualize</span></code> action.</p>
+<p>A call is done as follows: <code class="docutils literal"><span class="pre">./run.py</span> <span class="pre">&lt;action&gt;</span> <span class="pre">&lt;parameters&gt;</span></code>.
+Each action takes its owns set of parameters.</p>
+<p>Use <code class="docutils literal"><span class="pre">./run.py</span> <span class="pre">&lt;action&gt;</span> <span class="pre">--help</span></code> to get a list of all the parameters the action can take.</p>
+</div>
+<div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<p>Let’s suppose the data to be processed are located in the <cite>./data</cite> folder as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>.
+├── configs/
+│   ├── rConfigs.json
+│   └── vConfigs.json
+|
+├── data/
+│   ├── convergence_maps.fits
+│   ├── mask.fits
+│   └── shear_maps.fits
+|
+├── g2k_lib/
+│   ├── dct_interpolation.py
+│   ├── __init__.py
+│   ├── metrics.py
+│   ├── objects.py
+│   ├── operations.py
+│   ├── projection_methods.py
+│   ├── visuals.py
+├── MANIFEST.in
+├── README.md
+├── requirements.txt
+├── run.py
+└── setup.py
+</pre></div>
+</div>
+<p>Where <cite>mask.fits</cite> is a binary map of missing data; <cite>shear_maps.fits</cite> consists in two shear maps (E-mode map and B-mode map); <cite>convergence_maps.fits</cite> is a simulated convergence map corresponding to <cite>shear_maps.fits</cite> that can be used as a ground truth map to evaluate the quality of reconstruction.</p>
+<div class="section" id="compute-action">
+<h2><code class="docutils literal"><span class="pre">compute</span></code> action<a class="headerlink" href="#compute-action" title="Permalink to this headline">¶</a></h2>
+<p>``
+./run.py compute –gamma ./data/shear_maps.fits  –mask ./data/mask.fits –method ‘iKS’ –niter 50 –bconstraint 10 –output ./data/result.fits
+``
+The above instruction will compute the convergence map corresponding to the given shear map, mask map and the method of computation; Here the result will be computed using the iterative Kaiser-Squires method for 50 iterations and with 10 pixels for border constraint and it will be stored into the <cite>result.fits</cite> file.</p>
+<p><cite>result.fits</cite> will contain two maps, one for each mode.</p>
+</div>
+<div class="section" id="evaluate-action">
+<h2><code class="docutils literal"><span class="pre">evaluate</span></code> action<a class="headerlink" href="#evaluate-action" title="Permalink to this headline">¶</a></h2>
+<p>To evaluate the quality of the reconstruction, it is possible to compare <cite>result.fits</cite> with <cite>convergence_maps.fits</cite>, the <code class="docutils literal"><span class="pre">evaluate</span></code> action should be used to do so.</p>
+<p>``
+./run.py evaluate –kappa ./data/result.fits –gnd_truth ./data/convergence_maps.fits –output ./data/table.json
+``
+The error value will be stored into a JSON file corresponding to the method used to compute the estimated convergence map.</p>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Next topic</h4>
+  <p class="topless"><a href="g2k_lib.html"
+                        title="next chapter">g2k_lib package</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="g2k_lib.html" title="g2k_lib package"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">g2k_lib 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Remy Leroy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>
