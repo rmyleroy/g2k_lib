@@ -177,25 +177,44 @@ def iterative(g1map, g2map, mask, Niter=0, bpix="None", dct=False, sbound=False,
         constraint = generate_constraint(mask, bpix)
     range_ = tqdm(range(1, Niter + 1)) if tqdm_import else range(1, Niter + 1)
     for i in range_:
-        next_kE, next_kB = next_step_gradient(
-            kE, kB, g1map, g2map, mask, reduced)
+        next_kE, next_kB = next_step_gradient(kE, kB, g1map, g2map, mask, reduced)
+
         if dilation:
             constraint = generate_constraint(
                 mask=mask, bpix=bpix, dilation=dilation, i=i, Niter=Niter + 1)
+
         if dct:
             if i == 1:
                 # The maximum value of the DCT transform of the E-mode kappa map
                 # is used as the maximum threshold value
                 max_threshold = np.max(dct2d(next_kE))
                 min_threshold = 0
-            pm.dct_inpaint(kE=next_kE, i=i, Niter=Niter,
-                           max_threshold=max_threshold, min_threshold=min_threshold)
-            print("DCT: DONE!") if verbose else None
-        if sbound:
-            # TODO: define std_constraint
-            next_kE = std_constraint(next_kE, mask)
+            pm.dct_inpaint(kE=next_kE, i=i, Niter=Niter, max_threshold=max_threshold, min_threshold=min_threshold)
+
+        next_kE = std_constraint(next_kE, mask) if sbound else next_kE
+
     return next_kE, next_kB
 
+
+def std_constraint(image, mask, nscales):
+    # TODO Test of std_constraint
+    scales = starlet2d(image=image, nscales=nscales)
+    result = 0
+    for scale in scales[:-2]:
+        result += std_flattening(scale, mask)
+    for scale in scales[-2:]:
+        result += scale
+    return result
+
+
+def std_flattening(data, mask):
+    # TODO Test of std_flattening
+    if data.shape != mask.shape:
+        raise ValueError("dimension ")
+    std_out = data[mask.astype(bool)].std()
+    std_in = data[~mask.astype(bool)].std()
+    flat_data = data * (mask + (~mask.astype(bool)).astype(int) * (std_out / std_in))
+    return flat_data
 
 def compute_kappa(gamma_path, mask_path, niter, bpix, dct, sbound, reduced, dilation, verbose):
     """
