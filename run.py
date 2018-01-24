@@ -1,9 +1,8 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-from g2k_lib.projection_methods import MethodNames
+from g2k_lib.projection_methods import HARMONIC, LINEAR, ERF
 from g2k_lib.operations import compute_errors, compute_kappa
-from g2k_lib.visuals import visualize
 from g2k_lib.objects import Config
 import argparse
 import json
@@ -55,52 +54,77 @@ class Parser(object):
                                 instead of observed shear maps
         """
 
-        parser = argparse.ArgumentParser(description=__doc__, prog='compute')
-        parser.add_argument('-g', '--gammas', type=str, required=True,
-                            help='Path to the fits file containing gamma maps.')
-        parser.add_argument('-k', '--mask', type=str, required=True,
-                            help='Path to the fits file containing the mask.')
-        parser.add_argument('-b', '--bconstraint', type=str,
-                            help='Number of border constraint pixels (Bzero: for all pixels to zero).')
-        parser.add_argument('-m', '--method', type=str, choices=MethodNames.get_names(),
-                            help='Method to be used in the computation of kappa maps.')
-        parser.add_argument('-n', '--niter', type=int,
-                            help='Number of iteration to compute kappa maps.')
+        parser = argparse.ArgumentParser(description=__doc__, prog="compute")
+        parser.add_argument("--gammas", type=str, required=True,
+                            help="Path to the fits file containing gamma maps.")
+        parser.add_argument("--mask", type=str,
+                            help="Path to the fits file containing the mask.")
+        parser.add_argument("-n", "--niter", default=1, type=int,
+                            help="Number of iteration to compute kappa maps.")
+        parser.add_argument("-b", "--bpix", default="None", type=str,
+                            help="Number of border constraint pixels (Bzero: for all pixels to zero).")
+        parser.add_argument("--relaxed", action="store_true",
+                            help="Enables relaxed border constraint.")
+        parser.add_argument("--relax-type", type=str, default=ERF, choices=[
+                            LINEAR, ERF, HARMONIC], help="Determines the decreasing law followed by the relaxation parameter, used when --relaxed is given.")
+        parser.add_argument("--dct", action="store_true",
+                            help="Enables DCT filtering over E-mode.")
+        parser.add_argument("--dct-type", type=str, default=ERF, choices=[
+                            LINEAR, ERF], help="Determines the decreasing law followed by the threshold parameter, used when --dct is given.")
+        parser.add_argument("--sbound", action="store_true",
+                            help="Enables standard deviation constraint to data located inside mask holes.")
+        parser.add_argument("--dilation", action="store_true",
+                            help="Enables a linear decreasing of BPIX over iterations.")
+        parser.add_argument("--reduced", action="store_true",
+                            help="Compute convergence maps using reduced shear maps instead of observed shear maps")
+        parser.add_argument("--verbose", action="store_true",
+                            help="Enables information display.")
+        parser.add_argument("--no-padding", action="store_true",
+                            help="Disables padding option.")
 
-        parser.add_argument('-c', '--config', type=str, default='default',
-                            help='Configuration name stored in ../configs/rConfig.json.')
-        parser.add_argument('-o', '--output', type=str,
-                            help='Name under the output fits file will be saved.')
-        parser.add_argument('-p', '--plot', action='store_true',
-                            help='Plot the output (but does not save!!).')
-        parser.add_argument('-r', '--rename', action='store_true',
-                            help='Enable the auto-renaming for the output files to add more information in file names.')
-        parser.add_argument('-f', '--force', action='store_true',
-                            help='Overwrite the output file if it already exists')
-        parser.add_argument('--reduced', action='store_true',
-                            help='Compute convergence maps using reduced shear maps instead of observed shear maps')
+        parser.add_argument("--output", type=str,
+                            help="Name under the output fits file will be saved.")
+        parser.add_argument("--plot", action="store_true",
+                            help="Plot the output (but does not save!!).")
+        parser.add_argument("--rename", action="store_true",
+                            help="Enable the auto-renaming for the output files to add more information in file names.")
+        parser.add_argument("-f", "--force", action="store_true",
+                            help="Overwrite the output file if it already exists")
 
         args = parser.parse_args(argv)
-        config = Config.get_configuration('rConfigs', args)
 
-        if config.rename:
-            config.output = config.output.replace('.fits', '_{}_{}iter_{}bpix.fits'.format(config.method,
-                                                                                           config.niter, config.bconstraint))
-
-        if os.path.exists(config.output) and not config.force:
-            sys.exit(
-                "The output file already exists: '{}' please use -f option to overwrite".format(config.output))
-        if not config.output:
+        if not args.output:
             print("The output name field is empty, the result won't be saved")
+        else:
+            output = args.output
+            if output[-5:] != ".fits":
+                output += ".fits"
+            if args.rename:
+                _dct = "_DCT" if args.dct else ""
+                _relaxed = "_relaxed" if args.relaxed else ""
+                _relax_type = "_{}".format(
+                    args.relax_type) if args.relaxed and args.relax_type else ""
+                _dct_type = "_{}".format(
+                    args.dct_type) if args.dct and args.dct_type else ""
+                _sbound = "_sbound" if args.sbound else ""
+                _dilation = "_dilation" if args.dilation else ""
+                _reduced = "_reduced" if args.reduced else ""
+                _niter = "_{}iter".format(args.niter)
+                _bpix = "_{}bpix".format(args.bpix)
+                output = output.replace(
+                    ".fits", _niter + _bpix + _reduced + _dct + _dct_type + _dilation + _relaxed + _relax_type + _sbound + ".fits")
+            if os.path.exists(output) and not args.force:
+                sys.exit(
+                    "The output file already exists: '{}' please use -f option to overwrite".format(os.path.abspath(args.output)))
 
-        kappa = compute_kappa(config)
-
+        # kappa = compute_kappa(args.gammas, agrs.mask, )
+        return
         # According to the -o option, saves or plots both kappaE and kappaB.
-        if config.output:
-            if os.path.exists(config.output):
-                os.remove(config.output)
-            kappa.save(config.output)
-        if config.plot:
+        if output:
+            if os.path.exists(output) and args.force:
+                os.remove(output)
+            kappa.save(output)
+        if args.plot:
             kappa.plot()
             raw_input()
 
