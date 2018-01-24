@@ -7,13 +7,13 @@ LINEAR = "lin"
 ERF = "erf"
 
 
-def iks_relaxed(kB, i, Niter, constraint, mask, type_=LINEAR, verbose=False):
+def iks_relaxed(kB, i, Niter, constraint, mask, relax_type, verbose=False):
     # Decreasing weight according to the number of iterations
-    if type_ == LINEAR:
+    if relax_type == LINEAR:
         weight = get_threshold_n_lin(n=i, Niter=Niter, th_max=0, th_min=1)
-    elif type_ == ERF:
+    elif relax_type == ERF:
         weight = get_threshold_n_erf(n=i, Niter=Niter, th_max=0, th_min=1)
-    elif type_ == HARMONIC:
+    elif relax_type == HARMONIC:
         weight = 1 / (float(Niter + 1) - i)
     print("weight: {:.4}".format(weight)) if verbose else None
     # Apply the relaxed constraint to the B mode
@@ -27,11 +27,16 @@ def iks(kB, constraint):
     return next_kB
 
 
-def dct_inpaint(kE, i, Niter, max_threshold, min_threshold, type_=ERF, verbose=False):
+def dct_inpaint(kE, i, Niter, max_threshold, min_threshold, threshold_type=ERF, verbose=False):
     # Evaluates threshold value for DCT filtering
-    threshold = get_threshold_n_erf(n=i, Niter=Niter,
-                                    th_max=max_threshold,
-                                    th_min=min_threshold)
+    if threshold_type == ERF:
+        threshold = get_threshold_n_erf(n=i, Niter=Niter,
+                                        th_max=max_threshold,
+                                        th_min=min_threshold)
+    elif threshold_type == LINEAR:
+        threshold = get_threshold_n_lin(n=i, Niter=Niter,
+                                        th_max=max_threshold,
+                                        th_min=min_threshold)
     print("threshold: {:.4}".format(threshold)) if verbose else None
     # DCT filtering
     next_kE = filtering(kE, threshold)

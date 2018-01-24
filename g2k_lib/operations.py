@@ -4,7 +4,7 @@ from __future__ import print_function, division
 from transforms import filtering, dct2d, ks, ksinv, starlet2d
 from scipy.ndimage import binary_erosion
 from objects import Image, ComputedKappa, ResultRegister
-from metrics import get_error, norm
+from metrics import get_error
 import projection_methods as pm
 import numpy as np
 import copy
@@ -102,6 +102,88 @@ def cut_mask(data, mask):
     return (data * mask)[xmin:xmax + 1, ymin:ymax + 1]
 
 
+def add_padding(image):
+    """
+        Doubles the number of pixels along each axis by adding zero values arround the image.
+
+        Parameters
+        ----------
+            image : array_like
+                Image to be padded.
+
+        Returns
+        -------
+            array_like
+                Padded image.
+
+        Examples
+        --------
+
+            # Odd number of pixels
+            >>> image = numpy.array([[1]])
+            >>> add_padding(image)
+            array([[0., 0., 0.],
+                   [0., 1., 0.],
+                   [0., 0., 0.]])
+
+            # Even number of pixels
+            >>> image = numpy.array([[1,2],
+                                     [3,4]])
+            >>> add_padding(image)
+            array([[0., 0., 0., 0.],
+                   [0., 1., 2., 0.],
+                   [0., 3., 4., 0.],
+                   [0., 0., 0., 0.]])
+
+        See Also
+        --------
+            remove_padding : Inverse function.
+    """
+    if len(image.shape) == 2:
+        nx, ny = image.shape
+        image_ = np.zeros((nx * 2 + nx % 2, ny * 2 + ny % 2))
+        image_[nx / 2 + nx % 2:-nx / 2, ny / 2 + ny % 2:-ny / 2] = image
+        return image_
+    else:
+        raise ValueError("Image must have at least 2 dimensions.")
+
+
+def remove_padding(image):
+    """
+        Reduces by half the size of the image by removing border pixels.
+
+        Parameters
+        ----------
+            image : array_like
+                Image to be unpadded.
+
+        Returns
+        -------
+            array_like
+                Unpadded image.
+
+        Examples
+        --------
+
+            >>> image = numpy.array([[0., 0., 0., 0.],
+                                     [0., 1., 2., 0.],
+                                     [0., 0., 0., 0.]])
+            >>> remove_padding(image)
+            array([[1., 2.])
+
+        See Also
+        --------
+            add_padding : Inverse function.
+    """
+    if len(image.shape) == 2:
+        nx, ny = image.shape
+        image_ = np.zeros((nx * 2 + nx % 2, ny * 2 + ny % 2))
+        image_[nx / 2 + nx % 2:-nx / 2, ny / 2 + ny % 2:-ny / 2] = image
+        return image_
+    else:
+        raise ValueError("Image must have at least 2 dimensions.")
+
+
 def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
     """
         Computes the gradient and evaluates the next kappa values.
@@ -142,7 +224,7 @@ def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
     return kE + dkE, kB + dkB
 
 
-def iterative(g1map, g2map, mask, Niter=0, bpix="None", dct=False, sbound=False, reduced=False, dilation=False, verbose=False):
+def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relaxed_type=pm.ERF, dct=False, dct_type=pm.ERF, sbound=False, reduced=False, dilation=False, verbose=False):
     """
         Iteratively computes next kappa maps according to the given method
         and the number of iterations.
@@ -177,7 +259,7 @@ def iterative(g1map, g2map, mask, Niter=0, bpix="None", dct=False, sbound=False,
         constraint = generate_constraint(mask, bpix)
     range_ = tqdm(range(1, Niter + 1)) if tqdm_import else range(1, Niter + 1)
     for i in range_:
-        next_kE, next_kB = next_step_gradient(kE, kB, g1map, g2map, mask, reduced)
+        kE, kB = next_step_gradient(kE, kB, g1map, g2map, mask, reduced)
 
         if dilation:
             constraint = generate_constraint(
@@ -187,13 +269,22 @@ def iterative(g1map, g2map, mask, Niter=0, bpix="None", dct=False, sbound=False,
             if i == 1:
                 # The maximum value of the DCT transform of the E-mode kappa map
                 # is used as the maximum threshold value
-                max_threshold = np.max(dct2d(next_kE))
+                max_threshold = np.max(dct2d(kE))
                 min_threshold = 0
-            pm.dct_inpaint(kE=next_kE, i=i, Niter=Niter, max_threshold=max_threshold, min_threshold=min_threshold)
+            pm.dct_inpaint(kE=kE, i=i, Niter=Niter,
+                           max_threshold=max_threshold, min_threshold=min_threshold)
 
-        next_kE = std_constraint(next_kE, mask) if sbound else next_kE
+        if sbound:
+            kE = std_constraint(kE, mask)
 
-    return next_kE, next_kB
+        if relaxed:
+            kB = pm.iks_relaxed(kB=kB, i=i, Niter=Niter,
+                                constraint=constraint, mask=mask, relax_type=relax_type, verbose=verbose)
+
+        else:
+            kB = pm.iks(kB=kB, constraint=constraint)
+
+    return kE, kB
 
 
 def std_constraint(image, mask, nscales):
@@ -213,8 +304,10 @@ def std_flattening(data, mask):
         raise ValueError("dimension ")
     std_out = data[mask.astype(bool)].std()
     std_in = data[~mask.astype(bool)].std()
-    flat_data = data * (mask + (~mask.astype(bool)).astype(int) * (std_out / std_in))
+    flat_data = data * \
+        (mask + (~mask.astype(bool)).astype(int) * (std_out / std_in))
     return flat_data
+
 
 def compute_kappa(gamma_path, mask_path, niter, bpix, dct, sbound, reduced, dilation, verbose):
     """
@@ -239,12 +332,30 @@ def compute_kappa(gamma_path, mask_path, niter, bpix, dct, sbound, reduced, dila
     """
     print("fetching shear maps from {}".format(gamma_path)) if verbose else None
     gammas = Image.from_fits(gamma_path)  # Loads gamma from fits file
-    print("fetching mask map from {}".format(mask_path)) if verbose else None
-    mask = Image.from_fits(mask_path).get_layer()  # Loads mask from fits file
-    g1map = gammas.get_layer(0)
-    g2map = gammas.get_layer(1)
+
+    g1map = gammas.get_layer(
+        0) if no_padding else add_padding(gammas.get_layer(0))
+    g2map = gammas.get_layer(
+        1) if no_padding else add_padding(gammas.get_layer(1))
+    if g1map.shape != g2map.shape:
+        raise ValueError("Different shear map shapes: Got {} and {}.".format(
+            g1map.shape, g2map.shape))
+    if mask_path:
+        print("fetching mask map from {}".format(
+            mask_path)) if verbose else None
+        # Loads mask from fits file
+        mask = Image.from_fits(mask_path).get_layer()
+    else:
+        mask = np.ones_like(g1map)
+    if mask.shape != g1map.shape:
+        raise ValueError("Cannot proceed with mask and shear maps of different shape: Got {} and {}.".format(
+            mask.shape, g2map.shape))
+
     # Estimates kappa maps
     kE, kB = iterative()  # TODO: give proper parameters
+
+    kE = kE.get_layer(0) if no_padding else remove_padding(kE.get_layer(0))
+    kB = kB.get_layer(1) if no_padding else remove_padding(kB.get_layer(1))
     data = np.array([kE, kB])
     return Image(data)
 
