@@ -1,24 +1,64 @@
 # -*- coding: utf-8 -*-
 
-from scipy.fftpack import dct, idct
 from scipy.special import erf
 from astropy.io import fits
+from objects import Image
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+
+IM_DCT_EXEC = os.path.abspath("./bin/im_dct")
+_TMP_IN_DCT_PATH = os.path.abspath("/tmp/im_dct_in.fits")
+_TMP_OUT_DCT_PATH = os.path.abspath("/tmp/im_dct_out.fits")
 
 
-def dct2d(array, norm='ortho'):
+def dct2d(array, block_size=None, overlap=False):
     """
-    The 2-dimensional DCT applied to the given array.
+    Call the im_dct C++ routine to compute the corresponding DCT.
     """
-    return dct(dct(array.T, norm=norm).T, norm=norm)
+    if os.path.exists(_TMP_IN_DCT_PATH):
+        os.remove(_TMP_IN_DCT_PATH)
+    if os.path.exists(_TMP_OUT_DCT_PATH):
+        os.remove(_TMP_OUT_DCT_PATH)
+    Image(array).save(_TMP_IN_DCT_PATH)
+    opt = ''
+    block_size_max = array.shape[0]
+    if not block_size:
+        block_size = block_size_max
+    if block_size:
+        if type(block_size) == int and block_size <= block_size_max:
+            opt += " -b {} ".format(block_size)
+    if Overlap:
+        opt += " -O "
+    exec_command = str.join(
+        ' ', [IM_DCT_EXEC, opt, _TMP_IN_DCT_PATH, _TMP_OUT_DCT_PATH])
+    os.system(exec_command)
+    return Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
 
 
-def idct2d(array, norm='ortho'):
+def idct2d(array, block_size=None, overlap=False):
     """
     Returns the 2-dimensional inverse DCT applied to the given array.
     """
-    return idct(idct(array.T, norm=norm).T, norm=norm)
+    if os.path.exists(_TMP_IN_DCT_PATH):
+        os.remove(_TMP_IN_DCT_PATH)
+    if os.path.exists(_TMP_OUT_DCT_PATH):
+        os.remove(_TMP_OUT_DCT_PATH)
+    Image(array).save(_TMP_IN_DCT_PATH)
+    opt = ' -r'
+    block_size_max = array.shape[0]
+    if not block_size:
+        block_size = block_size_max
+    if block_size:
+        if type(block_size) == int and block_size <= block_size_max:
+            opt += " -b {} ".format(block_size)
+    if Overlap:
+        opt += " -O "
+
+    exec_command = str.join(
+        ' ', [IM_DCT_EXEC, opt, _TMP_IN_DCT_PATH, _TMP_OUT_DCT_PATH])
+    os.system(exec_command)
+    return Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
 
 
 def hard_threshold(array, value):
@@ -36,18 +76,23 @@ def soft_threshold(array, value):
     array -= np.sign(array) * value
 
 
-def filtering(signal, threshold, norm=0):
+def filtering(signal, threshold, block_size=None, overlap=False, norm=0):
     """
     This method return the input signal after its DCT components have been filtered.
     """
-    alpha = dct2d(signal)
+
+    block_size_max = signal.shape[0]
+    if not block_size:
+        block_size = block_size_max
+    alpha = dct2d(signal, block_size, overlap)
     th_alpha = alpha
     if norm == 0:
         hard_threshold(th_alpha, threshold)
     if norm == 1:
         soft_threshold(th_alpha, threshold)
-    th_alpha[0, 0] = alpha[0, 0]  # Keep the 0 frequency component
-    return idct2d(th_alpha)
+    th_alpha[::block_size, ::block_size] = alpha[::block_size,
+                                                 ::block_size]  # Keep the 0 frequency component
+    return idct2d(th_alpha, block_size, overlap)
 
 
 def get_threshold_n_lin(n, Niter, th_max, th_min):

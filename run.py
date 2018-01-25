@@ -71,6 +71,10 @@ class Parser(object):
                             help="Enables DCT filtering over E-mode.")
         parser.add_argument("--dct-type", type=str, default=ERF, choices=[
                             LINEAR, ERF], help="Determines the decreasing law followed by the threshold parameter, used when --dct is given.")
+        parser.add_argument("--dct-block-size", type=int,
+                            help="Determines the size of block for DCT computation, used when --dct is given.")
+        parser.add_argument("--overlap", action="store_true",
+                            help="Enables the overlapping method for DCT computation, used when --dct is given.")
         parser.add_argument("--sbound", action="store_true",
                             help="Enables standard deviation constraint to data located inside mask holes.")
         parser.add_argument("--dilation", action="store_true",
@@ -83,7 +87,7 @@ class Parser(object):
                             help="Disables padding option.")
 
         parser.add_argument("--output", type=str,
-                            help="Name under the output fits file will be saved.")
+                            help="Output file name.")
         parser.add_argument("--plot", action="store_true",
                             help="Plot the output (but does not save!!).")
         parser.add_argument("--rename", action="store_true",
@@ -100,27 +104,28 @@ class Parser(object):
             if output[-5:] != ".fits":
                 output += ".fits"
             if args.rename:
-                _dct = "_DCT" if args.dct else ""
-                _relaxed = "_relaxed" if args.relaxed else ""
-                _relax_type = "_{}".format(
-                    args.relax_type) if args.relaxed and args.relax_type else ""
-                _dct_type = "_{}".format(
-                    args.dct_type) if args.dct and args.dct_type else ""
-                _sbound = "_sbound" if args.sbound else ""
-                _dilation = "_dilation" if args.dilation else ""
-                _reduced = "_reduced" if args.reduced else ""
-                _niter = "_{}iter".format(args.niter)
-                _bpix = "_{}bpix".format(args.bpix)
+                _dct = "DCT" if args.dct else ""
+                _relaxed = "relaxed" if args.relaxed else ""
+                _relax_type = args.relax_type if args.relaxed and args.relax_type else ""
+                _dct_type = args.dct_type if args.dct and args.dct_type else ""
+                _dct_block_size = str(
+                    args.dct_block_size) if args.dct and args.dct_block_size else ""
+                _overlap = "overlap" if args.dct and args.overlap else ""
+                _sbound = "sbound" if args.sbound else ""
+                _dilation = "dilation" if args.dilation else ""
+                _reduced = "reduced" if args.reduced else ""
+                _niter = "{}iter".format(args.niter)
+                _bpix = "{}bpix".format(args.bpix)
                 output = output.replace(
-                    ".fits", _niter + _bpix + _reduced + _dct + _dct_type + _dilation + _relaxed + _relax_type + _sbound + ".fits")
+                    ".fits", "_" + str.join('_', filter(None, [_niter, _bpix, _reduced, _dct, _dct_type, _dct_block_size,
+                                                               _overlap, _dilation, _relaxed, _relax_type, _sbound])) + ".fits")
             if os.path.exists(output) and not args.force:
                 sys.exit(
                     "The output file already exists: '{}' please use -f option to overwrite".format(os.path.abspath(args.output)))
+        kappa = compute_kappa(args.gammas, args.mask, args.niter, args.bpix, args.relaxed, args.relax_type, args.dct, args.dct_type,
+                              args.dct_block_size, args.overlap, args.sbound, args.reduced, args.dilation, args.verbose, args.no_padding)
 
-        # kappa = compute_kappa(args.gammas, agrs.mask, )
-        return
-        # According to the -o option, saves or plots both kappaE and kappaB.
-        if output:
+        if args.output:
             if os.path.exists(output) and args.force:
                 os.remove(output)
             kappa.save(output)

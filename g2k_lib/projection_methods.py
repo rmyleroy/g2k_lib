@@ -27,7 +27,7 @@ def iks(kB, constraint):
     return next_kB
 
 
-def dct_inpaint(kE, i, Niter, max_threshold, min_threshold, threshold_type=ERF, verbose=False):
+def dct_inpaint(kE, i, Niter, max_threshold, min_threshold, threshold_type=ERF, block_size=None, overlap=False, verbose=False):
     # Evaluates threshold value for DCT filtering
     if threshold_type == ERF:
         threshold = get_threshold_n_erf(n=i, Niter=Niter,
@@ -39,24 +39,6 @@ def dct_inpaint(kE, i, Niter, max_threshold, min_threshold, threshold_type=ERF, 
                                         th_min=min_threshold)
     print("threshold: {:.4}".format(threshold)) if verbose else None
     # DCT filtering
-    next_kE = filtering(kE, threshold)
+    next_kE = filtering(kE, threshold, block_size, overlap)
 
     return next_kE
-
-
-def full_dct(next_kE, next_kB, i, Niter, max_threshold, min_threshold, constraint, mask):
-    # Evaluates thresholding value for DCT filtering
-    threshold = get_threshold_n_erf(n=i, Niter=Niter - 1,
-                                    th_max=max_threshold,
-                                    th_min=min_threshold)
-    # DCT filtering
-    next_kE = filtering(next_kE, threshold)
-    # Constraint over the standard deviation value inside holes in the mask
-    std_out = next_kE[mask.astype(bool)].std()
-    std_in = next_kE[~mask.astype(bool)].std()
-    next_kE *= mask + (~mask.astype(bool)).astype(int) * (std_out / std_in)
-
-    # kill the B mode
-    kE, kB = iks(next_kE, next_kB, 0)
-
-    return kE, kB

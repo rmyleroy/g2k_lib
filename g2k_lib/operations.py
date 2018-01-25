@@ -142,7 +142,8 @@ def add_padding(image):
     if len(image.shape) == 2:
         nx, ny = image.shape
         image_ = np.zeros((nx * 2 + nx % 2, ny * 2 + ny % 2))
-        image_[nx / 2 + nx % 2:-nx / 2, ny / 2 + ny % 2:-ny / 2] = image
+        image_[int(nx / 2) + nx % 2:-int(nx / 2), int(ny / 2) + ny %
+               2:-int(ny / 2)] = image
         return image_
     else:
         raise ValueError("Image must have at least 2 dimensions.")
@@ -177,8 +178,8 @@ def remove_padding(image):
     """
     if len(image.shape) == 2:
         nx, ny = image.shape
-        image_ = np.zeros((nx * 2 + nx % 2, ny * 2 + ny % 2))
-        image_[nx / 2 + nx % 2:-nx / 2, ny / 2 + ny % 2:-ny / 2] = image
+        image_ = image[int(nx / 4) + nx % 2:-int(nx / 4),
+                       int(ny / 4) + ny % 2:-int(ny / 4)]
         return image_
     else:
         raise ValueError("Image must have at least 2 dimensions.")
@@ -224,7 +225,7 @@ def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
     return kE + dkE, kB + dkB
 
 
-def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relaxed_type=pm.ERF, dct=False, dct_type=pm.ERF, sbound=False, reduced=False, dilation=False, verbose=False):
+def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relaxed_type=pm.ERF, dct=False, dct_type=pm.ERF, block_size=None, overlap=False, sbound=False, reduced=False, dilation=False, verbose=False):
     """
         Iteratively computes next kappa maps according to the given method
         and the number of iterations.
@@ -272,7 +273,7 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relaxed_t
                 max_threshold = np.max(dct2d(kE))
                 min_threshold = 0
             pm.dct_inpaint(kE=kE, i=i, Niter=Niter,
-                           max_threshold=max_threshold, min_threshold=min_threshold)
+                           max_threshold=max_threshold, min_threshold=min_threshold, block_size=block_size, overlap=overlap)
 
         if sbound:
             kE = std_constraint(kE, mask)
@@ -291,10 +292,9 @@ def std_constraint(image, mask, nscales):
     # TODO Test of std_constraint
     scales = starlet2d(image=image, nscales=nscales)
     result = 0
-    for scale in scales[:-2]:
+    for scale in scales[:-1]:
         result += std_flattening(scale, mask)
-    for scale in scales[-2:]:
-        result += scale
+    result += scales[-1]
     return result
 
 
@@ -309,7 +309,7 @@ def std_flattening(data, mask):
     return flat_data
 
 
-def compute_kappa(gamma_path, mask_path, niter, bpix, dct, sbound, reduced, dilation, verbose):
+def compute_kappa(gamma_path, mask_path, niter, bpix, relaxed, relax_type, dct, dct_type, dct_block_size, overlap, sbound, reduced, dilation, verbose, no_padding):
     """
         Returns the computed kappa corresponding to the given configuration.
 
@@ -352,10 +352,10 @@ def compute_kappa(gamma_path, mask_path, niter, bpix, dct, sbound, reduced, dila
             mask.shape, g2map.shape))
 
     # Estimates kappa maps
-    kE, kB = iterative()  # TODO: give proper parameters
-
-    kE = kE.get_layer(0) if no_padding else remove_padding(kE.get_layer(0))
-    kB = kB.get_layer(1) if no_padding else remove_padding(kB.get_layer(1))
+    kE, kB = iterative(g1map=g1map, g2map=g2map, mask=mask, Niter=niter, bpix=bpix, relaxed=relaxed, relaxed_type=relax_type, dct=dct,
+                       dct_type=dct_type, block_size=dct_block_size, overlap=overlap, sbound=sbound, reduced=reduced, dilation=dilation, verbose=verbose)
+    kE = kE if no_padding else remove_padding(kE)
+    kB = kB if no_padding else remove_padding(kB)
     data = np.array([kE, kB])
     return Image(data)
 
