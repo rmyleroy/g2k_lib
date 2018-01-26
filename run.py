@@ -3,7 +3,8 @@
 
 from g2k_lib.projection_methods import HARMONIC, LINEAR, ERF
 from g2k_lib.operations import compute_errors, compute_kappa
-from g2k_lib.objects import Config
+from g2k_lib.objects import Config, Image
+from g2k_lib.metrics import get_error
 import argparse
 import json
 import sys
@@ -94,6 +95,8 @@ class Parser(object):
                             help="Enable the auto-renaming for the output files to add more information in file names.")
         parser.add_argument("-f", "--force", action="store_true",
                             help="Overwrite the output file if it already exists")
+        parser.add_argument("--truth", type=str,
+                            help="Path to the fits file containing the true convergence field map.")
 
         args = parser.parse_args(argv)
 
@@ -129,6 +132,10 @@ class Parser(object):
             if os.path.exists(output) and args.force:
                 os.remove(output)
             kappa.save(output)
+        if args.truth and os.path.exists(args.truth):
+            truth = Image.from_fits(args.truth).get_layer()
+            diff = kappa.get_layer() - truth
+            print(get_error(diff, Image.from_fits(args.mask).get_layer(), truth))
         if args.plot:
             kappa.plot()
             raw_input()

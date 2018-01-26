@@ -28,11 +28,13 @@ def dct2d(array, block_size=None, overlap=False):
     if block_size:
         if type(block_size) == int and block_size <= block_size_max:
             opt += " -b {} ".format(block_size)
-    if Overlap:
+    if overlap:
         opt += " -O "
     exec_command = str.join(
         ' ', [IM_DCT_EXEC, opt, _TMP_IN_DCT_PATH, _TMP_OUT_DCT_PATH])
-    os.system(exec_command)
+    err = os.system(exec_command)
+    if err:
+        raise EnvironmentError("im_dct missed the call.")
     return Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
 
 
@@ -52,12 +54,14 @@ def idct2d(array, block_size=None, overlap=False):
     if block_size:
         if type(block_size) == int and block_size <= block_size_max:
             opt += " -b {} ".format(block_size)
-    if Overlap:
+    if overlap:
         opt += " -O "
 
     exec_command = str.join(
         ' ', [IM_DCT_EXEC, opt, _TMP_IN_DCT_PATH, _TMP_OUT_DCT_PATH])
-    os.system(exec_command)
+    err = os.system(exec_command)
+    if err:
+        raise EnvironmentError("im_dct missed the call.")
     return Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
 
 

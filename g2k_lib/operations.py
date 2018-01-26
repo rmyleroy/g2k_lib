@@ -221,11 +221,12 @@ def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
         r1 = (g1map - g1) * mask
         r2 = (g2map - g2) * mask
     dkE, dkB = ks(r1, r2)
+    next_kE, next_kB = kE + dkE, kB + dkB
+    print((np.linalg.norm(next_kE - kE), np.linalg.norm(next_kB - kB)))
+    return next_kE, next_kB
 
-    return kE + dkE, kB + dkB
 
-
-def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relaxed_type=pm.ERF, dct=False, dct_type=pm.ERF, block_size=None, overlap=False, sbound=False, reduced=False, dilation=False, verbose=False):
+def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_type=pm.ERF, dct=False, dct_type=pm.ERF, block_size=None, overlap=False, sbound=False, reduced=False, dilation=False, verbose=False):
     """
         Iteratively computes next kappa maps according to the given method
         and the number of iterations.
@@ -254,12 +255,15 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relaxed_t
                 Both (E and B) computed kappa.
 
     """
+    print("Initialization.") if verbose else None
     kE, kB = np.zeros_like(g1map), np.zeros_like(
         g2map)  # A first estimate of kappa maps used as initialization
     if not dilation:
+        print("Constraint construction.") if verbose else None
         constraint = generate_constraint(mask, bpix)
     range_ = tqdm(range(1, Niter + 1)) if tqdm_import else range(1, Niter + 1)
     for i in range_:
+        print("Next step evaluation from iteration {}.".format(i - 1))
         kE, kB = next_step_gradient(kE, kB, g1map, g2map, mask, reduced)
 
         if dilation:
@@ -273,7 +277,7 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relaxed_t
                 max_threshold = np.max(dct2d(kE))
                 min_threshold = 0
             pm.dct_inpaint(kE=kE, i=i, Niter=Niter,
-                           max_threshold=max_threshold, min_threshold=min_threshold, block_size=block_size, overlap=overlap)
+                           max_threshold=max_threshold, min_threshold=min_threshold, block_size=block_size, overlap=overlap, verbose=verbose)
 
         if sbound:
             kE = std_constraint(kE, mask)
@@ -288,7 +292,7 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relaxed_t
     return kE, kB
 
 
-def std_constraint(image, mask, nscales):
+def std_constraint(image, mask, nscales=5):
     # TODO Test of std_constraint
     scales = starlet2d(image=image, nscales=nscales)
     result = 0
@@ -344,15 +348,17 @@ def compute_kappa(gamma_path, mask_path, niter, bpix, relaxed, relax_type, dct, 
         print("fetching mask map from {}".format(
             mask_path)) if verbose else None
         # Loads mask from fits file
-        mask = Image.from_fits(mask_path).get_layer()
+        mask = Image.from_fits(mask_path).get_layer() if no_padding else add_padding(
+            Image.from_fits(mask_path).get_layer())
     else:
+        print("No mask to be applied.") if verbose else None
         mask = np.ones_like(g1map)
     if mask.shape != g1map.shape:
         raise ValueError("Cannot proceed with mask and shear maps of different shape: Got {} and {}.".format(
             mask.shape, g2map.shape))
 
     # Estimates kappa maps
-    kE, kB = iterative(g1map=g1map, g2map=g2map, mask=mask, Niter=niter, bpix=bpix, relaxed=relaxed, relaxed_type=relax_type, dct=dct,
+    kE, kB = iterative(g1map=g1map, g2map=g2map, mask=mask, Niter=niter, bpix=bpix, relaxed=relaxed, relax_type=relax_type, dct=dct,
                        dct_type=dct_type, block_size=dct_block_size, overlap=overlap, sbound=sbound, reduced=reduced, dilation=dilation, verbose=verbose)
     kE = kE if no_padding else remove_padding(kE)
     kB = kB if no_padding else remove_padding(kB)

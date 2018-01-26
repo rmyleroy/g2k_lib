@@ -20,10 +20,12 @@ def get_error(diff, mask, truth, type_="std"):
             float
                 The percentage ratio.
     """
+    if mask is None:
+        mask = np.ones_like(diff)
     if type_ == "std":
         num = np.std(diff[mask.astype(bool)])
         denom = np.std(truth[mask.astype(bool)])
     if type_ == "norm":
         num = np.linalg.norm(diff[mask.astype(bool)])
         denom = np.linalg.norm(truth[mask.astype(bool)])
-    return 100 * num / float(denum)
+    return 100 * num / float(denom)
