@@ -163,7 +163,7 @@ def ks(g1map, g2map):
 
         See Also
         --------
-            ks93inv : Invers of ks93 function.
+            ksinv : Invers of ks function.
     """
     # g1map and g2map should be the same size
     (nx, ny) = g1map.shape
@@ -207,7 +207,7 @@ def ksinv(kEmap, kBmap):
 
         See Also
         --------
-            ks93 : Invers of ks93inv function.
+            ks : Invers of ksinv function.
     """
     # kEmap and kBmap should be the same size
     (nx, ny) = kEmap.shape
@@ -294,7 +294,7 @@ def k2g_fits(k_path, g_path, mask_path=None, noise_path=None):
         print("Cannot handle kappa with more than 2 layers.")
         return
     # Evaluates gamma maps
-    g1map, g2map = ks93inv(k1map, k2map)
+    g1map, g2map = ksinv(k1map, k2map)
     # Apply the mask and noise over the compute gamma maps...
     gamma = Image(np.array([(g1map + n1) * mask, (g2map + n2) * mask]))
     # ... Then it is stored in a fits file under the given name

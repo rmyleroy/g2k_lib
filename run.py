@@ -13,19 +13,20 @@ import os
 
 # Below is the parser to handle the input arguments that will be provided
 class Parser(object):
-    def __init__(self):
+    def __init__(self, argv=sys.argv):
         parser = argparse.ArgumentParser(
             description="Determine which action to take.")
         parser.add_argument('action', type=str, choices=['compute', 'evaluate', 'visualize'],
                             help='Action to perform')
 
         args = parser.parse_args(
-            [sys.argv[1] if len(sys.argv) > 1 else sys.argv])
-        del sys.argv[1]
+            [argv[1] if len(argv) > 1 else argv])
+        del argv[1]
 
         getattr(self, args.action)()
 
-    def compute(self, argv=sys.argv[2:]):
+    @classmethod
+    def compute(cls, argv=sys.argv[2:]):
         """
         usage: compute [-h] -g GAMMAS -k MASK [-b BCONSTRAINT]
                        [-m {DCT inpainting,full DCT,iKS,iKS Relaxed,KS}] [-n NITER]
