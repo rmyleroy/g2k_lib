@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from g2k_lib.projection_methods import HARMONIC, LINEAR, ERF
-from g2k_lib.operations import compute_errors, compute_kappa
+from g2k_lib.operations import compute_errors, compute_kappa, add_padding
 from g2k_lib.objects import Config, Image
 from g2k_lib.metrics import get_error
 import argparse
@@ -57,7 +57,7 @@ class Parser(object):
         """
 
         parser = argparse.ArgumentParser(description=__doc__, prog="compute")
-        parser.add_argument("--gammas", type=str, required=True,
+        parser.add_argument("--gamma", type=str, required=True,
                             help="Path to the fits file containing gamma maps.")
         parser.add_argument("--mask", type=str,
                             help="Path to the fits file containing the mask.")
@@ -96,48 +96,76 @@ class Parser(object):
                             help="Enable the auto-renaming for the output files to add more information in file names.")
         parser.add_argument("-f", "--force", action="store_true",
                             help="Overwrite the output file if it already exists")
-        parser.add_argument("--truth", type=str,
-                            help="Path to the fits file containing the true convergence field map.")
 
         args = parser.parse_args(argv)
 
-        if not args.output:
+        gamma_path = os.path.abspath(args.gamma)
+        mask_path = os.path.abspath(args.mask) if args.mask else None
+        niter = args.niter
+        bpix = args.bpix
+        relaxed = args.relaxed
+        relax_type = args.relax_type
+        dct = args.dct
+        dct_type = args.dct_type
+        dct_block_size = args.dct_block_size
+        overlap = args.overlap
+        sbound = args.sbound
+        dilation = args.dilation
+        reduced = args.reduced
+        verbose = args.verbose
+        no_padding = args.no_padding
+        output = args.output
+        plot = args.plot
+        rename = args.rename
+        force = args.force
+
+        # Input control
+#=============================================================================
+        if not os.path.exists(gamma_path):
+            sys.exit("File '{}' does not exist".format(gamma_path))
+        if mask_path and not os.path.exists(mask_path):
+            sys.exit("File '{}' does not exist".format(mask_path))
+        if niter < 0:
+            print("WARNING: Negative iteration number. Won't perform any iteration.")
+        if bpix not in {"None", "Bzero"}:
+            try:
+                int(bpix)
+            except:
+                sys.exit("bpix must be 'None' (default), 'Bzero' or an integer.")
+        if not output:
             print("The output name field is empty, the result won't be saved")
         else:
-            output = args.output
             if output[-5:] != ".fits":
                 output += ".fits"
-            if args.rename:
-                _dct = "DCT" if args.dct else ""
-                _relaxed = "relaxed" if args.relaxed else ""
-                _relax_type = args.relax_type if args.relaxed and args.relax_type else ""
-                _dct_type = args.dct_type if args.dct and args.dct_type else ""
+            if rename:
+                _dct = "DCT" if dct else ""
+                _relaxed = "relaxed" if relaxed else ""
+                _relax_type = relax_type if relaxed and relax_type else ""
+                _dct_type = dct_type if dct and dct_type else ""
                 _dct_block_size = str(
-                    args.dct_block_size) if args.dct and args.dct_block_size else ""
-                _overlap = "overlap" if args.dct and args.overlap else ""
-                _sbound = "sbound" if args.sbound else ""
-                _dilation = "dilation" if args.dilation else ""
-                _reduced = "reduced" if args.reduced else ""
-                _niter = "{}iter".format(args.niter)
-                _bpix = "{}bpix".format(args.bpix)
+                    dct_block_size) if dct and dct_block_size else ""
+                _overlap = "overlap" if dct and overlap else ""
+                _sbound = "sbound" if sbound else ""
+                _dilation = "dilation" if dilation else ""
+                _reduced = "reduced" if reduced else ""
+                _niter = "{}iter".format(niter)
+                _bpix = "{}bpix".format(bpix)
                 output = output.replace(
                     ".fits", "_" + str.join('_', filter(None, [_niter, _bpix, _reduced, _dct, _dct_type, _dct_block_size,
                                                                _overlap, _dilation, _relaxed, _relax_type, _sbound])) + ".fits")
-            if os.path.exists(output) and not args.force:
+            if os.path.exists(output) and not force:
                 sys.exit(
-                    "The output file already exists: '{}' please use -f option to overwrite".format(os.path.abspath(args.output)))
-        kappa = compute_kappa(args.gammas, args.mask, args.niter, args.bpix, args.relaxed, args.relax_type, args.dct, args.dct_type,
-                              args.dct_block_size, args.overlap, args.sbound, args.reduced, args.dilation, args.verbose, args.no_padding)
+                    "The output file already exists: '{}' please use -f/--force option to overwrite".format(os.path.abspath(output)))
+#=============================================================================
 
-        if args.output:
-            if os.path.exists(output) and args.force:
+        kappa = compute_kappa(gamma, mask, niter, bpix, relaxed, relax_type, dct, dct_type,
+                              dct_block_size, overlap, sbound, reduced, dilation, verbose, no_padding)
+
+        if output:
+            if os.path.exists(output) and force:
                 os.remove(output)
             kappa.save(output)
-        if args.truth and os.path.exists(args.truth):
-            truth = Image.from_fits(args.truth).get_layer()
-            diff = kappa.get_layer() - truth
-            print(get_error(diff, Image.from_fits(args.mask).get_layer(), truth))
-        if args.plot:
+        if plot:
             kappa.plot()
             raw_input()
 
