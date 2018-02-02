@@ -2,9 +2,9 @@
 
 from __future__ import print_function, division
 from transforms import filtering, dct2d, ks, ksinv, starlet2d
-from scipy.ndimage import binary_erosion
-from objects import Image, ComputedKappa, ResultRegister
 from metrics import get_error
+from objects import Image
+from struct import add_padding, remove_padding, generate_constraint
 import projection_methods as pm
 import numpy as np
 import copy
@@ -17,172 +17,6 @@ except ImportError:
     tqdm_import = False
 else:
     tqdm_import = True
-
-
-def generate_constraint(mask, bpix, dilation=False, i=None, Niter=None):
-    """
-        Generate a constraint matrix to be applied over the B mode;
-        it is build using some erosion methods on the given mask.
-
-        Parameters
-        ----------
-            mask : array_like
-                Mask relative to missing data.
-            bpix : int
-                Defines the size of the structuring element.
-
-        Todo
-        ----
-            Add documentation regarding the dilation
-
-        Returns
-        -------
-            array_like
-                The constraint matrix.
-
-        Example
-        --------
-            >>> mask = numpy.array([[0, 0, 0, 0, 0],
-                                    [0, 1, 1, 1, 0],
-                                    [0, 1, 1, 1, 0],
-                                    [0, 1, 1, 1, 0],
-                                    [0, 0, 0, 0, 0]])
-            >>> generate_constraint(mask, 1)
-            array([[0, 0, 0, 0, 0],
-                   [0, 0, 0, 0, 0],
-                   [0, 0, 1, 0, 0],
-                   [0, 0, 0, 0, 0],
-                   [0, 0, 0, 0, 0]])
-
-    """
-    if bpix == "None":
-        return np.ones_like(mask)  # No constraint
-
-    elif bpix == "Bzero":
-        return np.zeros_like(mask)  # full constraint, 0 value everywhere
-
-    else:
-        if dilation:
-            bpix = int(int(bpix) * (1 - (i - 1) / float(Niter - 1)))
-        else:
-            bpix = int(bpix)
-    struct = np.ones((2 * bpix + 1, 2 * bpix + 1))  # Square structuring element
-    # Erodes the mask to get the constraint matrix
-    constraint = binary_erosion(mask, struct).astype(mask.dtype)
-
-    return constraint
-
-
-def cut_mask(data, mask):
-    """
-        Apply the mask over the data and cut data to get rid of the frame.
-
-        Parameters
-        ----------
-            data : array_like
-                Matrix with values to be extracted.
-            mask : array_like
-                Mask and data must have the same shape.
-
-        Returns
-        -------
-            array_like
-                Extracted version of the data matrix.
-
-        Note
-        -----
-            The frame is determined by the outtermost nonzero values.
-
-    """
-    nz = np.nonzero(mask)
-    xmax = np.max(nz[0])
-    xmin = np.min(nz[0])
-    ymax = np.max(nz[1])
-    ymin = np.min(nz[1])
-    return (data * mask)[xmin:xmax + 1, ymin:ymax + 1]
-
-
-def add_padding(image):
-    """
-        Doubles the number of pixels along each axis by adding zero values arround the image.
-
-        Parameters
-        ----------
-            image : array_like
-                Image to be padded.
-
-        Returns
-        -------
-            array_like
-                Padded image.
-
-        Examples
-        --------
-
-            # Odd number of pixels
-            >>> image = numpy.array([[1]])
-            >>> add_padding(image)
-            array([[0., 0., 0.],
-                   [0., 1., 0.],
-                   [0., 0., 0.]])
-
-            # Even number of pixels
-            >>> image = numpy.array([[1,2],
-                                     [3,4]])
-            >>> add_padding(image)
-            array([[0., 0., 0., 0.],
-                   [0., 1., 2., 0.],
-                   [0., 3., 4., 0.],
-                   [0., 0., 0., 0.]])
-
-        See Also
-        --------
-            remove_padding : Inverse function.
-    """
-    if len(image.shape) == 2:
-        nx, ny = image.shape
-        image_ = np.zeros((nx * 2 + nx % 2, ny * 2 + ny % 2))
-        image_[int(nx / 2) + nx % 2:-int(nx / 2), int(ny / 2) + ny %
-               2:-int(ny / 2)] = image
-        return image_
-    else:
-        raise ValueError("Image must have at least 2 dimensions.")
-
-
-def remove_padding(image):
-    """
-        Reduces by half the size of the image by removing border pixels.
-
-        Parameters
-        ----------
-            image : array_like
-                Image to be unpadded.
-
-        Returns
-        -------
-            array_like
-                Unpadded image.
-
-        Examples
-        --------
-
-            >>> image = numpy.array([[0., 0., 0., 0.],
-                                     [0., 1., 2., 0.],
-                                     [0., 0., 0., 0.]])
-            >>> remove_padding(image)
-            array([[1., 2.])
-
-        See Also
-        --------
-            add_padding : Inverse function.
-    """
-    if len(image.shape) == 2:
-        nx, ny = image.shape
-        image_ = image[int(nx / 4) + nx % 2:-int(nx / 4),
-                       int(ny / 4) + ny % 2:-int(ny / 4)]
-        return image_
-    else:
-        raise ValueError("Image must have at least 2 dimensions.")
 
 
 def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
@@ -222,7 +56,7 @@ def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
         r2 = (g2map - g2) * mask
     dkE, dkB = ks(r1, r2)
     next_kE, next_kB = kE + dkE, kB + dkB
-    print((np.linalg.norm(next_kE - kE), np.linalg.norm(next_kB - kB)))
+    # print((np.linalg.norm(next_kE - kE), np.linalg.norm(next_kB - kB)))
     return next_kE, next_kB
 
 
@@ -255,20 +89,23 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_typ
                 Both (E and B) computed kappa.
 
     """
-    print("Initialization.") if verbose else None
+    if verbose:
+        print("Initialization.")
     kE, kB = np.zeros_like(g1map), np.zeros_like(
         g2map)  # A first estimate of kappa maps used as initialization
     if not dilation:
-        print("Constraint construction.") if verbose else None
+        if verbose:
+            print("Constraint construction.")
         constraint = generate_constraint(mask, bpix)
     range_ = tqdm(range(1, Niter + 1)) if tqdm_import else range(1, Niter + 1)
     for i in range_:
-        print("Next step evaluation from iteration {}.".format(i - 1))
+        if verbose:
+            print("Next step evaluation from iteration {}.".format(i - 1))
         kE, kB = next_step_gradient(kE, kB, g1map, g2map, mask, reduced)
 
         if dilation:
-            constraint = generate_constraint(
-                mask=mask, bpix=bpix, dilation=dilation, i=i, Niter=Niter + 1)
+            bpix_dil = str(int(int(bpix) * (1 - (i - 1) / float(Niter))))
+            constraint = generate_constraint(mask, bpix_dil)
 
         if dct:
             if i == 1:
@@ -334,7 +171,8 @@ def compute_kappa(gamma_path, mask_path, niter, bpix, relaxed, relax_type, dct, 
                 Image with both modes of the computed kappa maps.
 
     """
-    print("fetching shear maps from {}".format(gamma_path)) if verbose else None
+    if verbose:
+        print("Loading shear maps from {}".format(gamma_path))
     gammas = Image.from_fits(gamma_path)  # Loads gamma from fits file
 
     g1map = gammas.get_layer(
@@ -345,13 +183,15 @@ def compute_kappa(gamma_path, mask_path, niter, bpix, relaxed, relax_type, dct, 
         raise ValueError("Different shear map shapes: Got {} and {}.".format(
             g1map.shape, g2map.shape))
     if mask_path:
-        print("fetching mask map from {}".format(
-            mask_path)) if verbose else None
+        if verbose:
+            print("Loading mask map from {}".format(
+                mask_path))
         # Loads mask from fits file
         mask = Image.from_fits(mask_path).get_layer() if no_padding else add_padding(
             Image.from_fits(mask_path).get_layer())
     else:
-        print("No mask to be applied.") if verbose else None
+        if verbose:
+            print("No mask to be applied.")
         mask = np.ones_like(g1map)
     if mask.shape != g1map.shape:
         raise ValueError("Cannot proceed with mask and shear maps of different shape: Got {} and {}.".format(
@@ -366,7 +206,7 @@ def compute_kappa(gamma_path, mask_path, niter, bpix, relaxed, relax_type, dct, 
     return Image(data)
 
 
-def compute_errors(computed_kappa_path, gnd_truth_path, output_path=None):
+def compute_errors(computed_kappa_path, mask_path, gnd_truth_path, error_type):
     """
         Evaluates both errors (E and B), then stores the values in the computed kappa header
         and in a global results register.
@@ -387,11 +227,11 @@ def compute_errors(computed_kappa_path, gnd_truth_path, output_path=None):
                 for both modes.
     """
     # Loads data from the computed kappa file.
-    computed_kappa = ComputedKappa.from_fits(computed_kappa_path)
+    computed_kappa = Image.from_fits(computed_kappa_path)
     # Loads data from the ground truth kappa file
     gnd_truth = Image.from_fits(gnd_truth_path)
     # Loads the mask used to compute the estimated kappa map.
-    mask = Image.from_fits(computed_kappa.mask_path)
+    mask = Image.from_fits(mask_path)
     # Check if there is a B mode to consider in the error computation.
     layers_truth = gnd_truth.layers
     if layers_truth == 1:
@@ -402,7 +242,7 @@ def compute_errors(computed_kappa_path, gnd_truth_path, output_path=None):
     elif layers_truth == 2:
         # If there is a B-mode...
         gndB = gnd_truth.get_layer(1)
-        if norm(gndB):
+        if np.linalg.norm(gndB):
             # ... and non zero, then we compute the B-mode error according to it, ...
             denomB = gndB
         else:
@@ -416,22 +256,9 @@ def compute_errors(computed_kappa_path, gnd_truth_path, output_path=None):
     diff = computed_kappa.get_layer(0) - gnd_truth.get_layer(0)
     diffB = computed_kappa.get_layer(1) - gndB  # B-mode difference.
 
-    computed_kappa.header['ERROR_E'] = get_error(
-        diff[mask.get_layer().astype(bool)], gnd_truth.get_layer()[mask.get_layer().astype(bool)])
-    computed_kappa.header['ERROR_B'] = get_error(
-        diffB[mask.get_layer().astype(bool)], denomB[mask.get_layer().astype(bool)])
+    errorE = get_error(
+        diff, mask.get_layer(), gnd_truth.get_layer(), error_type)
+    errorB = get_error(
+        diffB, mask.get_layer(), denomB, error_type)
 
-    computed_kappa.save()
-
-    if not output_path:
-        output_path = gnd_truth_path.replace(
-            'inputs', 'outputs').replace('.fits', '.json')
-
-    rr = ResultRegister(output_path)
-    rr.set_error(computed_kappa.method, computed_kappa.niter, computed_kappa.bconstraint,
-                 computed_kappa.header['ERROR_E'], 'e')
-    rr.set_error(computed_kappa.method, computed_kappa.niter, computed_kappa.bconstraint,
-                 computed_kappa.header['ERROR_B'], 'b')
-    rr.save()
-
-    return Image(np.array([diff, diffB]))
+    return errorE, errorB

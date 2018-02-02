@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from g2k_lib.projection_methods import HARMONIC, LINEAR, ERF
-from g2k_lib.operations import compute_errors, compute_kappa, add_padding
-from g2k_lib.objects import Config, Image
+from g2k_lib.operations import compute_errors, compute_kappa
+from g2k_lib.objects import Image
 from g2k_lib.metrics import get_error
+import numpy as np
 import argparse
 import json
 import sys
@@ -55,12 +56,13 @@ class Parser(object):
           --reduced             Compute convergence maps using reduced shear maps
                                 instead of observed shear maps
         """
-
         parser = argparse.ArgumentParser(description=__doc__, prog="compute")
         parser.add_argument("--gamma", type=str, required=True,
                             help="Path to the fits file containing gamma maps.")
         parser.add_argument("--mask", type=str,
                             help="Path to the fits file containing the mask.")
+        parser.add_argument("--truth", type=str,
+                            help="Path to the fits file containing the truth.")
         parser.add_argument("-n", "--niter", default=1, type=int,
                             help="Number of iteration to compute kappa maps.")
         parser.add_argument("-b", "--bpix", default="None", type=str,
@@ -90,6 +92,11 @@ class Parser(object):
 
         parser.add_argument("--output", type=str,
                             help="Output file name.")
+        parser.add_argument("--error-file", type=str,
+                            help="File name where error values will be saved. --truth must be given.")
+        parser.add_argument("--error-type", type=str, default="std", choices=[
+                            "std", "norm"], help="Determines the formula used to compute the error. --truth must be given.")
+
         parser.add_argument("--plot", action="store_true",
                             help="Plot the output (but does not save!!).")
         parser.add_argument("--rename", action="store_true",
@@ -101,6 +108,7 @@ class Parser(object):
 
         gamma_path = os.path.abspath(args.gamma)
         mask_path = os.path.abspath(args.mask) if args.mask else None
+        truth_path = os.path.abspath(args.truth) if args.truth else None
         niter = args.niter
         bpix = args.bpix
         relaxed = args.relaxed
@@ -115,6 +123,8 @@ class Parser(object):
         verbose = args.verbose
         no_padding = args.no_padding
         output = args.output
+        error_file = args.error_file
+        error_type = args.error_type
         plot = args.plot
         rename = args.rename
         force = args.force
@@ -125,13 +135,17 @@ class Parser(object):
             sys.exit("File '{}' does not exist".format(gamma_path))
         if mask_path and not os.path.exists(mask_path):
             sys.exit("File '{}' does not exist".format(mask_path))
+        if truth_path and not os.path.exists(truth_path):
+            sys.exit("File '{}' does not exist".format(truth_path))
         if niter < 0:
             print("WARNING: Negative iteration number. Won't perform any iteration.")
         if bpix not in {"None", "Bzero"}:
-            try:
-                int(bpix)
-            except:
-                sys.exit("bpix must be 'None' (default), 'Bzero' or an integer.")
+            if not bpix.isdigit():
+                sys.exit(
+                    "bpix must be 'None' (default), 'Bzero' or an positive integer.")
+            else:
+                if int(bpix) < 0:
+                    sys.exit("bpix can't be negative.")
         if not output:
             print("The output name field is empty, the result won't be saved")
         else:
@@ -158,13 +172,43 @@ class Parser(object):
                     "The output file already exists: '{}' please use -f/--force option to overwrite".format(os.path.abspath(output)))
 #=============================================================================
 
-        kappa = compute_kappa(gamma, mask, niter, bpix, relaxed, relax_type, dct, dct_type,
+        kappa = compute_kappa(gamma_path, mask_path, niter, bpix, relaxed, relax_type, dct, dct_type,
                               dct_block_size, overlap, sbound, reduced, dilation, verbose, no_padding)
 
         if output:
             if os.path.exists(output) and force:
                 os.remove(output)
             kappa.save(output)
+
+            if mask_path and truth_path:
+                errorE, errorB = compute_errors(
+                    output, mask_path, truth_path, error_type)
+
+            if error_file:
+                dtype = [("niter", int),
+                         ("bpix", int),
+                         ("relaxed", '?'),
+                         ("relax_type", '|S4'),
+                         ("dct", '?'),
+                         ("dct_type", '|S3'),
+                         ("dct_block_size", "|S4"),
+                         ("overlap", '?'),
+                         ("sbound", '?'),
+                         ("dilation", '?'),
+                         ("reduced", '?'),
+                         ("errorE", float),
+                         ("errorB", float)]
+
+                entry = np.array([(niter, int(bpix) if bpix.isdigit() else -1 if bpix == "None" else -2, relaxed, relax_type, dct, dct_type,
+                                   dct_block_size, overlap, sbound, dilation, reduced, errorE, errorB)], dtype=dtype)
+                if os.path.exists(error_file):
+                    ef = np.load(error_file)
+                    ef = np.append(ef, np.array(entry, dtype=dtype))
+                    np.save(error_file, ef)
+                else:
+                    np.save(error_file, entry)
+            else:
+                print(errorE, errorB)
         if plot:
             kappa.plot()
             raw_input()

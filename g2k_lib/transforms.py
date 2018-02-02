@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from scipy.ndimage import convolve1d
 from scipy.special import erf
 from astropy.io import fits
 from objects import Image
@@ -299,9 +300,6 @@ def k2g_fits(k_path, g_path, mask_path=None, noise_path=None):
     gamma = Image(np.array([(g1map + n1) * mask, (g2map + n2) * mask]))
     # ... Then it is stored in a fits file under the given name
     gamma.save(g_path)
-
-
-from scipy.ndimage import convolve1d
 
 
 def starlet2d(image, nscales=5):

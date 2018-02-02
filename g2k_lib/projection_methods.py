@@ -15,7 +15,8 @@ def iks_relaxed(kB, i, Niter, constraint, mask, relax_type, verbose=False):
         weight = get_threshold_n_erf(n=i, Niter=Niter, th_max=0, th_min=1)
     elif relax_type == HARMONIC:
         weight = 1 / (float(Niter + 1) - i)
-    print("weight: {:.4}".format(weight)) if verbose else None
+    if verbose:
+        print("weight: {:.4}".format(weight))
     # Apply the relaxed constraint to the B mode
     relaxed_constraint = (constraint + (1 - constraint) * weight) * mask
     next_kB = kB * relaxed_constraint
@@ -37,7 +38,8 @@ def dct_inpaint(kE, i, Niter, max_threshold, min_threshold, threshold_type=ERF, 
         threshold = get_threshold_n_lin(n=i, Niter=Niter,
                                         th_max=max_threshold,
                                         th_min=min_threshold)
-    print("threshold: {:.4}".format(threshold)) if verbose else None
+    if verbose:
+        print("threshold: {:.4}".format(threshold))
     # DCT filtering
     next_kE = filtering(kE, threshold, block_size, overlap)
 
