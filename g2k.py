@@ -1,7 +1,7 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-from g2k_lib.projection_methods import HARMONIC, LINEAR, ERF
+from g2k_lib.projection_methods import HARMONIC, LINEAR, ERF, CST
 from g2k_lib.operations import compute_errors, compute_kappa
 from g2k_lib.objects import Image
 from g2k_lib.metrics import get_error
@@ -70,7 +70,7 @@ class Parser(object):
         parser.add_argument("--relaxed", action="store_true",
                             help="Enables relaxed border constraint.")
         parser.add_argument("--relax-type", type=str, default=ERF, choices=[
-                            LINEAR, ERF, HARMONIC], help="Determines the decreasing law followed by the relaxation parameter, used when --relaxed is given.")
+                            LINEAR, ERF, HARMONIC, CST], help="Determines the decreasing law followed by the relaxation parameter, used when --relaxed is given.")
         parser.add_argument("--dct", action="store_true",
                             help="Enables DCT filtering over E-mode.")
         parser.add_argument("--dct-type", type=str, default=ERF, choices=[

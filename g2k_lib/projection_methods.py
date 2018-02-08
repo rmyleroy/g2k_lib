@@ -5,6 +5,7 @@ from transforms import filtering, get_threshold_n_erf, get_threshold_n_lin
 HARMONIC = "harm"
 LINEAR = "lin"
 ERF = "erf"
+CST = "cst"
 
 
 def iks_relaxed(kB, i, Niter, constraint, mask, relax_type, verbose=False):
@@ -15,6 +16,9 @@ def iks_relaxed(kB, i, Niter, constraint, mask, relax_type, verbose=False):
         weight = get_threshold_n_erf(n=i, Niter=Niter, th_max=0, th_min=1)
     elif relax_type == HARMONIC:
         weight = 1 / (float(Niter + 1) - i)
+    elif relax_type == CST:
+        weight = 1 / 2.
+
     if verbose:
         print("weight: {:.4}".format(weight))
     # Apply the relaxed constraint to the B mode

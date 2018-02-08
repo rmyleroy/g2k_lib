@@ -104,6 +104,9 @@ class Image(object):
         """
         return self.data[layer]
 
+    def __getitem__(self, slices):
+        return self.data[slices]
+
     def plot(self, layer=-1, filename=None, **prefs):
         cmap = prefs['cmap'] if prefs.has_key("cmap") else 'gist_stern'
         xlabel = prefs['xlabel'] if prefs.has_key("xlabel") else ''

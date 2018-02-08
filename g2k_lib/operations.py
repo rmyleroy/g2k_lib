@@ -113,8 +113,8 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_typ
                 # is used as the maximum threshold value
                 max_threshold = np.max(dct2d(kE))
                 min_threshold = 0
-            pm.dct_inpaint(kE=kE, i=i, Niter=Niter,
-                           max_threshold=max_threshold, min_threshold=min_threshold, block_size=block_size, overlap=overlap, verbose=verbose)
+            kE = pm.dct_inpaint(kE=kE, i=i, Niter=Niter,
+                                max_threshold=max_threshold, min_threshold=min_threshold, block_size=block_size, overlap=overlap, verbose=verbose)
 
         if sbound:
             kE = std_constraint(kE, mask)

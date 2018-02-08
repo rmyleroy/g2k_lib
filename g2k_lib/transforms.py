@@ -6,17 +6,20 @@ from astropy.io import fits
 from objects import Image
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 import os
 
 IM_DCT_EXEC = os.path.abspath("./bin/im_dct")
-_TMP_IN_DCT_PATH = os.path.abspath("/tmp/im_dct_in.fits")
-_TMP_OUT_DCT_PATH = os.path.abspath("/tmp/im_dct_out.fits")
 
 
 def dct2d(array, block_size=None, overlap=False):
     """
     Call the im_dct C++ routine to compute the corresponding DCT.
     """
+    _TMP_IN_DCT_PATH = os.path.abspath(
+        "/local/home/releroy/Documents/data/tmp/im_dct_in_{}.fits".format(int(1000000 * time.time())))
+    _TMP_OUT_DCT_PATH = os.path.abspath(
+        "/local/home/releroy/Documents/data/tmp/im_dct_out_{}.fits".format(int(1000000 * time.time())))
     if os.path.exists(_TMP_IN_DCT_PATH):
         os.remove(_TMP_IN_DCT_PATH)
     if os.path.exists(_TMP_OUT_DCT_PATH):
@@ -36,13 +39,20 @@ def dct2d(array, block_size=None, overlap=False):
     err = os.system(exec_command)
     if err:
         raise EnvironmentError("im_dct missed the call.")
-    return Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
+    result = Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
+    os.remove(_TMP_IN_DCT_PATH)
+    os.remove(_TMP_OUT_DCT_PATH)
+    return result
 
 
 def idct2d(array, block_size=None, overlap=False):
     """
     Returns the 2-dimensional inverse DCT applied to the given array.
     """
+    _TMP_IN_DCT_PATH = os.path.abspath(
+        "/local/home/releroy/Documents/data/tmp/im_dct_in_{}.fits".format(int(1000000 * time.time())))
+    _TMP_OUT_DCT_PATH = os.path.abspath(
+        "/local/home/releroy/Documents/data/tmp/im_dct_out_{}.fits".format(int(1000000 * time.time())))
     if os.path.exists(_TMP_IN_DCT_PATH):
         os.remove(_TMP_IN_DCT_PATH)
     if os.path.exists(_TMP_OUT_DCT_PATH):
@@ -63,7 +73,10 @@ def idct2d(array, block_size=None, overlap=False):
     err = os.system(exec_command)
     if err:
         raise EnvironmentError("im_dct missed the call.")
-    return Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
+    result = Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
+    os.remove(_TMP_IN_DCT_PATH)
+    os.remove(_TMP_OUT_DCT_PATH)
+    return result
 
 
 def hard_threshold(array, value):
