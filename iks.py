@@ -17,7 +17,7 @@ class Parser(object):
     def __init__(self, argv=sys.argv):
         parser = argparse.ArgumentParser(
             description="Determine which action to take.")
-        parser.add_argument('action', type=str, choices=['compute', 'evaluate', 'visualize'],
+        parser.add_argument('action', type=str, choices=['compute', 'error'],
                             help='Action to perform')
 
         args = parser.parse_args(
@@ -213,7 +213,7 @@ class Parser(object):
             kappa.plot()
             raw_input()
 
-    def evaluate(self, argv=sys.argv[2:]):
+    def error(self, argv=sys.argv[2:]):
         """
         usage: run.py [-h] -g GND_TRUTH -k KAPPAS -o OUTPUT [-p] [--config CONFIG]
 
@@ -253,33 +253,6 @@ class Parser(object):
         if config.plot:
             diff.plot()
             raw_input()
-
-    def visualize(self, argv=sys.argv[2:]):
-        """
-        usage: run.py [-h] -r REGISTER_PATH [--config CONFIG]
-
-        Plot data from result files.
-
-        optional arguments:
-          -h, --help            show this help message and exit
-          -r REGISTER_PATH, --register-path REGISTER_PATH
-                                Path to the result register JSON file.
-          --config CONFIG       Configuration name stored in vConfigs.json.
-        """
-        parser = argparse.ArgumentParser(
-            description='Plot data from result files.')
-        parser.add_argument('-r', '--register-path', type=str, help='Path to the result register JSON file.',
-                            required=True)
-        parser.add_argument('--config', type=str, default='default',
-                            help='Configuration name stored in vConfigs.json.')
-        args = parser.parse_args(argv)
-        config = Config.get_configuration('vConfigs', args)
-
-        if not os.path.exists(config.register_path):
-            sys.exit("The specified register file does't exist: '{}'".format(
-                config.register))
-
-        visualize(config)
 
 
 if __name__ == '__main__':
