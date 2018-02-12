@@ -50,10 +50,12 @@ def generate_constraint(mask, bpix):
             bpix = int(bpix)
     else:
         raise ValueError("bpix must be 'None', 'Bzero' or an positive integer.")
-    struct = np.ones((2 * bpix + 1, 2 * bpix + 1))  # Square structuring element
     # Erodes the mask to get the constraint matrix
-    constraint = binary_erosion(mask, struct).astype(mask.dtype)
 
+    if bpix > 0:
+        constraint = binary_erosion(mask, iterations=bpix).astype(mask.dtype)
+    else:
+        constraint = mask
     return constraint
 
 
