@@ -132,11 +132,11 @@ class Parser(object):
         # Input control
 #=============================================================================
         if not os.path.exists(gamma_path):
-            sys.exit("File '{}' does not exist".format(gamma_path))
+            raise IOError("File '{}' does not exist".format(gamma_path))
         if mask_path and not os.path.exists(mask_path):
-            sys.exit("File '{}' does not exist".format(mask_path))
+            raise IOError("File '{}' does not exist".format(mask_path))
         if truth_path and not os.path.exists(truth_path):
-            sys.exit("File '{}' does not exist".format(truth_path))
+            raise IOError("File '{}' does not exist".format(truth_path))
         if niter < 0:
             print("WARNING: Negative iteration number. Won't perform any iteration.")
         if bpix not in {"None", "Bzero"}:
@@ -245,14 +245,6 @@ class Parser(object):
         parser.add_argument('--config', type=str, default='default',
                             help='Configuration name stored in rConfigs.json.')
         args = parser.parse_args(argv)
-        config = Config.get_configuration('rConfigs', args)
-
-        diff = compute_errors(
-            config.kappas, config.gnd_truth, config.output)
-
-        if config.plot:
-            diff.plot()
-            raw_input()
 
 
 if __name__ == '__main__':
