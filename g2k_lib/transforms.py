@@ -15,6 +15,24 @@ IM_DCT_EXEC = os.path.abspath("./bin/im_dct")
 def dct2d(array, block_size=None, overlap=False):
     """
     Call the im_dct C++ routine to compute the corresponding DCT.
+
+    Parameters
+    ----------
+        array : array_like
+            Image from which the DCT is computed.
+        block_size : int
+            Number of pixels of the block for a block DCT computation; By default set to image size.
+        overlap : bool
+            Enables the overlapping DCT method if set True.
+
+    Returns
+    -------
+    array_like
+        DCT of the provided image.
+
+    See Also
+    --------
+        idct2d : Inverse function
     """
     _TMP_IN_DCT_PATH = os.path.abspath(
         "/local/home/releroy/Documents/data/tmp/im_dct_in_{}.fits".format(int(1000000 * time.time())))
@@ -48,6 +66,23 @@ def dct2d(array, block_size=None, overlap=False):
 def idct2d(array, block_size=None, overlap=False):
     """
     Returns the 2-dimensional inverse DCT applied to the given array.
+    Parameters
+    ----------
+        array : array_like
+            Image from which the inverse DCT must be performed.
+        block_size : int
+            Number of pixels of the block for a block DCT computation; By default set to image size.
+        overlap : bool
+            Enables the overlapping DCT method if set True.
+
+    Returns
+    -------
+    array_like
+        DCT of the provided image.
+
+    See Also
+    --------
+        idct2d : Inverse function
     """
     _TMP_IN_DCT_PATH = os.path.abspath(
         "/local/home/releroy/Documents/data/tmp/im_dct_in_{}.fits".format(int(1000000 * time.time())))
@@ -222,6 +257,10 @@ def ksinv(kEmap, kBmap):
         See Also
         --------
             ks : Invers of ksinv function.
+
+        Note
+        ----
+            Written by A. Peel
     """
     # kEmap and kBmap should be the same size
     (nx, ny) = kEmap.shape
@@ -316,7 +355,26 @@ def k2g_fits(k_path, g_path, mask_path=None, noise_path=None):
 
 
 def starlet2d(image, nscales=5):
-    """Compute the multiscale 2D starlet transform of an image."""
+    """
+    Compute the multiscale 2D starlet transform of an image.
+
+    Parameters
+    ----------
+    image : array_like
+        Image to decompose.
+    nscales : int
+        Number of scales for the decomposition.
+
+    Returns
+    -------
+    array_like of array_like
+        Array of length equal to nscales, containing every scale of the decomposition.
+
+    Note
+    ----
+        Sum up all scales together to get the original image back.
+        Written by A. Peel.
+    """
     # Filter banks
     h = np.array([1, 4, 6, 4, 1]) / 16.
     # g = np.array([0, 0, 1, 0, 0]) - h
