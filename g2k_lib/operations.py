@@ -56,11 +56,11 @@ def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
         r2 = (g2map - g2) * mask
     dkE, dkB = ks(r1, r2)
     next_kE, next_kB = kE + dkE, kB + dkB
-    # print((np.linalg.norm(next_kE - kE), np.linalg.norm(next_kB - kB)))
+
     return next_kE, next_kB
 
 
-def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_type=pm.ERF, dct=False, dct_type=pm.ERF, block_size=None, overlap=False, sbound=False, reduced=False, dilation=False, verbose=False):
+def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_type=pm.LINEAR, dct=False, dct_type=pm.ERF, block_size=None, overlap=False, sbound=False, reduced=False, dilation=False, verbose=False):
     """
         Iteratively computes next kappa maps according to the given method
         and the number of iterations.
@@ -79,6 +79,13 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_typ
                 Number of pixel that caracterise the erosion to generate the constraint matrix.
                 No constraint if set to ``"None"`` (default).
                 Constraint over the entire image if set to ``"Bzero"``.
+            relaxed : bool
+                Enables the relaxed constraint option.
+            relax_type : str
+                Variation law the relaxed constraint must follow; Set to LINEAR
+            dct : bool
+                Enables dct inpainting method.
+            dct_type : str
             reduced : bool, optional
                 If set ``True``, ``g1map`` and ``g2map`` are considered as reduced shear maps,
                 else they are considered as observed shear maps (default).
