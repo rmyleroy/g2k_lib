@@ -60,7 +60,7 @@ def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
     return next_kE, next_kB
 
 
-def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_type=pm.LINEAR, dct=False, dct_type=pm.ERF, block_size=None, overlap=False, sbound=False, reduced=False, dilation=False, verbose=False):
+def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_type=pm.LINEAR, dct=False, dct_type=pm.ERF, block_size=None, overlap=False, sbound=False, reduced=False, dilation=False, verbose=False, no_pad=False):
     """
         Iteratively computes next kappa maps according to the given method
         and the number of iterations.
@@ -120,8 +120,12 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_typ
                 # is used as the maximum threshold value
                 max_threshold = np.max(dct2d(kE))
                 min_threshold = 0
-            kE = pm.dct_inpaint(kE=kE, i=i, Niter=Niter,
-                                max_threshold=max_threshold, min_threshold=min_threshold, block_size=block_size, overlap=overlap, verbose=verbose)
+            dct_kE = kE if no_pad else remove_padding(kE)
+            # print("kE: {}".format(kE.shape))
+            # print("dct_kE: {}".format(dct_kE.shape))
+            dct_kE = pm.dct_inpaint(kE=dct_kE, i=i, Niter=Niter,
+                                    max_threshold=max_threshold, min_threshold=min_threshold, block_size=block_size, overlap=overlap, verbose=verbose)
+            kE = dct_kE if no_pad else add_padding(dct_kE)
 
         if sbound:
             kE = std_constraint(kE, mask)
@@ -206,7 +210,7 @@ def compute_kappa(gamma_path, mask_path, niter, bpix, relaxed, relax_type, dct, 
 
     # Estimates kappa maps
     kE, kB = iterative(g1map=g1map, g2map=g2map, mask=mask, Niter=niter, bpix=bpix, relaxed=relaxed, relax_type=relax_type, dct=dct,
-                       dct_type=dct_type, block_size=dct_block_size, overlap=overlap, sbound=sbound, reduced=reduced, dilation=dilation, verbose=verbose)
+                       dct_type=dct_type, block_size=dct_block_size, overlap=overlap, sbound=sbound, reduced=reduced, dilation=dilation, verbose=verbose, no_pad=no_padding)
     kE = kE if no_padding else remove_padding(kE)
     kB = kB if no_padding else remove_padding(kB)
     data = np.array([kE, kB])

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from scipy.ndimage import convolve1d
+from scipy.fftpack import dct, idct
 from scipy.special import erf
 from astropy.io import fits
 from objects import Image
@@ -12,105 +13,176 @@ import os
 IM_DCT_EXEC = os.path.abspath("./bin/im_dct")
 
 
-def dct2d(array, block_size=None, overlap=False):
+def dct2d(image, blocksize=None, overlap=False, norm='isap'):
     """
-    Call the im_dct C++ routine to compute the corresponding DCT.
+    Compute the 2D Discrete Cosine Transform (type 2) of an image.
 
     Parameters
     ----------
-        array : array_like
-            Image from which the DCT is computed.
-        block_size : int
-            Number of pixels of the block for a block DCT computation; By default set to image size.
-        overlap : bool
-            Enables the overlapping DCT method if set True.
+    image : 2d-array
+        Image to transform.
+    norm : {None, 'ortho', 'isap'}, optional
+        Normalization option for `scipy.fftpack.dct`. Default is 'isap'.
+    blocksize : int, optional
+        TODO
+    overlap : bool, optional
+        TODO
 
-    Returns
-    -------
-    array_like
-        DCT of the provided image.
-
-    See Also
-    --------
-        idct2d : Inverse function
+    NOTE: apparently norm=None has a problem. ??
     """
-    _TMP_IN_DCT_PATH = os.path.abspath(
-        "/local/home/releroy/Documents/data/tmp/im_dct_in_{}.fits".format(int(1000000 * time.time())))
-    _TMP_OUT_DCT_PATH = os.path.abspath(
-        "/local/home/releroy/Documents/data/tmp/im_dct_out_{}.fits".format(int(1000000 * time.time())))
-    if os.path.exists(_TMP_IN_DCT_PATH):
-        os.remove(_TMP_IN_DCT_PATH)
-    if os.path.exists(_TMP_OUT_DCT_PATH):
-        os.remove(_TMP_OUT_DCT_PATH)
-    Image(array).save(_TMP_IN_DCT_PATH)
-    opt = ''
-    block_size_max = array.shape[0]
-    if not block_size:
-        block_size = block_size_max
-    if block_size:
-        if type(block_size) == int and block_size <= block_size_max:
-            opt += " -b {} ".format(block_size)
+    if norm not in [None, 'ortho', 'isap']:
+        print("Warning: invalid norm --> using isap")
+        norm = 'isap'
+
+    # Determine output shape
+    n = image.shape[0]
+    if blocksize is not None:
+        if blocksize == n:
+            result = np.zeros_like(image)
+        elif blocksize not in [n / 2, n / 4, n / 8]:
+            print("Warning: invalid blocksize --> using {}".format(n))
+            blocksize = n
+            result = np.zeros_like(image)
+        else:
+            if overlap:
+                size = 2 * n - blocksize
+                result = np.zeros((size, size))
+            else:
+                result = np.zeros_like(image)
+    else:
+        blocksize = n
+        result = np.zeros_like(image)
+
+    # Compute DCT on sub blocks
     if overlap:
-        opt += " -O "
-    exec_command = str.join(
-        ' ', [IM_DCT_EXEC, opt, _TMP_IN_DCT_PATH, _TMP_OUT_DCT_PATH])
-    err = os.system(exec_command)
-    if err:
-        raise EnvironmentError("im_dct missed the call.")
-    result = Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
-    os.remove(_TMP_IN_DCT_PATH)
-    os.remove(_TMP_OUT_DCT_PATH)
+        for ii in range(2 * n / blocksize - 1):
+            for jj in range(2 * n / blocksize - 1):
+                i1 = ii * blocksize
+                i2 = i1 + blocksize
+                j1 = jj * blocksize
+                j2 = j1 + blocksize
+                # print(i1, i2, j1, j2)
+                # print(i1/2, i1/2 + blocksize, j1/2, j1/2 + blocksize)
+                # print('------------------------')
+                imsub = image[i1 / 2:i1 / 2 + blocksize,
+                              j1 / 2:j1 / 2 + blocksize]
+                if norm in (None, 'ortho'):
+                    result[i1:i2, j1:j2] = dct(dct(imsub, norm=norm, axis=0),
+                                               norm=norm, axis=1)
+                else:
+                    result[i1:i2, j1:j2] = dct(dct(imsub, norm='ortho', axis=0),
+                                               norm='ortho', axis=1)
+                    result[i1:i2, j1:j2][:, 0] *= np.sqrt(2)
+                    result[i1:i2, j1:j2][0, :] *= np.sqrt(2)
+    else:
+        for ii in range(0, n, blocksize):
+            for jj in range(0, n, blocksize):
+                i1 = ii
+                i2 = ii + blocksize
+                j1 = jj
+                j2 = jj + blocksize
+                # print(i1, i2, j1, j2)
+                # print('------------------------')
+                imsub = image[i1:i2, j1:j2]
+                if norm in (None, 'ortho'):
+                    result[i1:i2, j1:j2] = dct(dct(imsub, norm=norm, axis=0),
+                                               norm=norm, axis=1)
+                else:
+                    result[i1:i2, j1:j2] = dct(dct(imsub, norm='ortho', axis=0),
+                                               norm='ortho', axis=1)
+                    result[i1:i2, j1:j2][:, 0] *= np.sqrt(2)
+                    result[i1:i2, j1:j2][0, :] *= np.sqrt(2)
+
     return result
 
 
-def idct2d(array, block_size=None, overlap=False):
+def idct2d(image, blocksize=None, overlap=False, norm="isap"):
     """
-    Returns the 2-dimensional inverse DCT applied to the given array.
+    Compute the inverse 2D Discrete Cosine Transform (type 2) of an image.
+
     Parameters
     ----------
-        array : array_like
-            Image from which the inverse DCT must be performed.
-        block_size : int
-            Number of pixels of the block for a block DCT computation; By default set to image size.
-        overlap : bool
-            Enables the overlapping DCT method if set True.
+    image : 2d-array
+        Image to transform.
+    norm : {None, 'ortho', 'isap'}, optional
+        Normalization option for `scipy.fftpack.idct`. Default is 'isap'.
+    blocksize : int, optional
+        TODO
+    overlap : bool, optional
+        TODO
 
-    Returns
-    -------
-    array_like
-        DCT of the provided image.
-
-    See Also
-    --------
-        idct2d : Inverse function
+    NOTE: apparently norm=None has a problem.
     """
-    _TMP_IN_DCT_PATH = os.path.abspath(
-        "/local/home/releroy/Documents/data/tmp/im_dct_in_{}.fits".format(int(1000000 * time.time())))
-    _TMP_OUT_DCT_PATH = os.path.abspath(
-        "/local/home/releroy/Documents/data/tmp/im_dct_out_{}.fits".format(int(1000000 * time.time())))
-    if os.path.exists(_TMP_IN_DCT_PATH):
-        os.remove(_TMP_IN_DCT_PATH)
-    if os.path.exists(_TMP_OUT_DCT_PATH):
-        os.remove(_TMP_OUT_DCT_PATH)
-    Image(array).save(_TMP_IN_DCT_PATH)
-    opt = ' -r'
-    block_size_max = array.shape[0]
-    if not block_size:
-        block_size = block_size_max
-    if block_size:
-        if type(block_size) == int and block_size <= block_size_max:
-            opt += " -b {} ".format(block_size)
-    if overlap:
-        opt += " -O "
+    if norm not in [None, 'ortho', 'isap']:
+        print("Warning: invalid norm --> using isap")
+        norm = 'isap'
 
-    exec_command = str.join(
-        ' ', [IM_DCT_EXEC, opt, _TMP_IN_DCT_PATH, _TMP_OUT_DCT_PATH])
-    err = os.system(exec_command)
-    if err:
-        raise EnvironmentError("im_dct missed the call.")
-    result = Image.from_fits(_TMP_OUT_DCT_PATH).get_layer()
-    os.remove(_TMP_IN_DCT_PATH)
-    os.remove(_TMP_OUT_DCT_PATH)
+    # Determine output shape
+    n = image.shape[0]
+    if blocksize is not None:
+        if blocksize == n:
+            result = np.zeros_like(image)
+        else:
+            if overlap:
+                size = (n + blocksize) / 2
+                result = np.zeros((size, size))
+            else:
+                result = np.zeros_like(image)
+    else:
+        blocksize = n
+        result = np.zeros_like(image)
+
+    # Compute inverse DCT on sub blocks
+    if overlap:
+        for ii in range(n / blocksize):
+            for jj in range(n / blocksize):
+                i1 = ii * blocksize
+                i2 = i1 + blocksize
+                j1 = jj * blocksize
+                j2 = j1 + blocksize
+                i1r = i1 / 2
+                i2r = i1r + blocksize
+                j1r = j1 / 2
+                j2r = j1r + blocksize
+                # print(i1, i2, j1, j2)
+                # print(i1r, i2r, j1r, j2r)
+                # print('------------------------')
+                imsub = image[i1:i2, j1:j2]
+                if norm == 'isap':
+                    imsub[:, 0] /= np.sqrt(2)
+                    imsub[0, :] /= np.sqrt(2)
+                    result[i1r:i2r, j1r:j2r] += idct(idct(imsub, norm='ortho', axis=0),
+                                                     norm='ortho', axis=1)
+
+                else:
+                    result[i1r:i2r, j1r:j2r] += idct(idct(imsub, norm=norm, axis=0),
+                                                     norm=norm, axis=1)
+        # Take averages
+        step = blocksize / 2
+        counts = np.ones_like(result)
+        counts[step:-step, :step] = 2
+        counts[step:-step, -step:] = 2
+        counts[:step, step:-step] = 2
+        counts[-step:, step:-step] = 2
+        counts[step:-step, step:-step] = 4
+        result /= counts
+    else:
+        for ii in range(0, n, blocksize):
+            for jj in range(0, n, blocksize):
+                i1 = ii
+                i2 = ii + blocksize
+                j1 = jj
+                j2 = jj + blocksize
+                imsub = image[i1:i2, j1:j2]
+                if norm == 'isap':
+                    imsub[:, 0] /= np.sqrt(2)
+                    imsub[0, :] /= np.sqrt(2)
+                    result[i1:i2, j1:j2] = idct(idct(imsub, norm='ortho', axis=0),
+                                                norm='ortho', axis=1)
+                else:
+                    result[i1:i2, j1:j2] = idct(idct(imsub, norm=norm, axis=0),
+                                                norm=norm, axis=1)
+
     return result
 
 
@@ -144,7 +216,7 @@ def filtering(signal, threshold, block_size=None, overlap=False, norm=0):
     if norm == 1:
         soft_threshold(th_alpha, threshold)
     th_alpha[::block_size, ::block_size] = alpha[::block_size,
-                                                 ::block_size]  # Keep the 0 frequency component
+                                                 ::block_size]  # Keep the 0 frequency component for each block
     return idct2d(th_alpha, block_size, overlap)
 
 
