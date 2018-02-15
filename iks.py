@@ -69,7 +69,7 @@ class Parser(object):
                             help="Number of border constraint pixels (Bzero: for all pixels to zero).")
         parser.add_argument("--relaxed", action="store_true",
                             help="Enables relaxed border constraint.")
-        parser.add_argument("--relax-type", type=str, default=ERF, choices=[
+        parser.add_argument("--relax-type", type=str, default=HARMONIC, choices=[
                             LINEAR, ERF, HARMONIC, CST], help="Determines the decreasing law followed by the relaxation parameter, used when --relaxed is given.")
         parser.add_argument("--dct", action="store_true",
                             help="Enables DCT filtering over E-mode.")
@@ -162,10 +162,11 @@ class Parser(object):
                 _sbound = "sbound" if sbound else ""
                 _dilation = "dilation" if dilation else ""
                 _reduced = "reduced" if reduced else ""
+                _noPad = "noPad" if no_padding else ""
                 _niter = "{}iter".format(niter)
                 _bpix = "{}bpix".format(bpix)
                 output = output.replace(
-                    ".fits", "_" + str.join('_', filter(None, [_niter, _bpix, _reduced, _dct, _dct_type, _dct_block_size,
+                    ".fits", "_" + str.join('_', filter(None, [_niter, _bpix, _reduced, _noPad, _dct, _dct_type, _dct_block_size,
                                                                _overlap, _dilation, _relaxed, _relax_type, _sbound])) + ".fits")
             if os.path.exists(output) and not force:
                 sys.exit(
@@ -238,12 +239,8 @@ class Parser(object):
                             help='Path to the kappas ground truth.')
         parser.add_argument('-k', '--kappas', type=str, required=True,
                             help='Path to the computed kappas')
-        parser.add_argument('-o', '--output', type=str, required=True,
-                            help='File where to store the result value.\n Will add the value to the provided JSON file, will create one if the file does not already exists.')
         parser.add_argument('-p', '--plot', action='store_true',
                             help='Plot the difference maps.')
-        parser.add_argument('--config', type=str, default='default',
-                            help='Configuration name stored in rConfigs.json.')
         args = parser.parse_args(argv)
 
 
