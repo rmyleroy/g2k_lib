@@ -120,12 +120,12 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_typ
                 # is used as the maximum threshold value
                 max_threshold = np.max(dct2d(kE))
                 min_threshold = 0
-            dct_kE = kE if no_pad else remove_padding(kE)
+            # dct_kE = kE if no_pad else remove_padding(kE)
             # print("kE: {}".format(kE.shape))
             # print("dct_kE: {}".format(dct_kE.shape))
-            dct_kE = pm.dct_inpaint(kE=dct_kE, i=i, Niter=Niter,
+            kE = pm.dct_inpaint(kE=kE, i=i, Niter=Niter,
                                     max_threshold=max_threshold, min_threshold=min_threshold, block_size=block_size, overlap=overlap, verbose=verbose)
-            kE = dct_kE if no_pad else add_padding(dct_kE)
+            # kE = dct_kE if no_pad else add_padding(dct_kE)
 
         if sbound:
             kE = std_constraint(kE, mask)
