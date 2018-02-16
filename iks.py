@@ -233,6 +233,7 @@ class Parser(object):
           -p, --plot            Plot the difference maps.
           --config CONFIG       Configuration name stored in rConfigs.json.
         """
+        raise NotImplementedError("The standalone error computation is not implemented yet.")
         parser = argparse.ArgumentParser(
             description='Compute errors between two fits.')
         parser.add_argument('-g', '--gnd_truth', type=str, required=True,
