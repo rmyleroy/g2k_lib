@@ -4,6 +4,7 @@ from scipy.ndimage import convolve1d
 from scipy.fftpack import dct, idct
 from scipy.special import erf
 from astropy.io import fits
+from struct import add_padding, remove_padding
 from objects import Image
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,6 +12,96 @@ import time
 import os
 
 IM_DCT_EXEC = os.path.abspath("./bin/im_dct")
+
+
+def new_dct2d(image, blockshape=None, overlap=False, norm='isap', pad=False):
+    """
+    Compute the 2D Discrete Cosine Transform (type 2) of an image.
+
+    Parameters
+    ----------
+    image : 2d-array
+        Image to transform.
+    norm : {None, 'ortho', 'isap'}, optional
+        Normalization option for `scipy.fftpack.dct`. Default is 'isap'.
+    blocksize : int, optional
+        TODO
+    overlap : bool, optional
+        TODO
+
+    NOTE: apparently norm=None has a problem. ??
+    """
+    if norm not in [None, 'ortho', 'isap']:
+        print("Warning: invalid norm --> using isap.")
+        norm = 'isap'
+
+    # Determine output shape
+    n, m = image.shape
+
+
+    if blockshape is not None:
+        if type(blockshape) is int:
+            k = l = blockshape  # Length and height of the block
+        elif type(blockshape) is tuple:
+            if len(blockshape) == 1:
+                k = l = blockshape[0]
+            elif len(blockshape) == 2:
+                k, l = blockshape
+            else:
+                raise ValueError("Length of blockshape parameter cannot exceed 3. Got {}.".format(len(blockshape)))
+        else:
+            raise TypeError("blockshape parameter must be a tuple, not '{}'.".format(type(blockshape)))
+        if type(k) is not int or type(l) is not int:
+            raise TypeError("blockshape items must be integers. Got {}.".format(blockshape))
+
+    else:
+        blocksize = (n, m)
+
+
+    # Compute DCT on sub blocks
+    if overlap:
+        for ii in range(2 * n / blocksize - 1):
+            for jj in range(2 * n / blocksize - 1):
+                i1 = ii * blocksize
+                j1 = jj * blocksize
+                # print(i1, i2, j1, j2)
+                # print(i1/2, i1/2 + blocksize, j1/2, j1/2 + blocksize)
+                # print('------------------------')
+                imsub = add_padding(image[i1 / 2:i1 / 2 + blocksize,
+                                          j1 / 2:j1 / 2 + blocksize])
+
+                i2, j2 = imsub.shape
+
+                if norm in (None, 'ortho'):
+                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2] = dct(dct(imsub, norm=norm, axis=0),
+                                               norm=norm, axis=1)
+                else:
+                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2] = dct(dct(imsub, norm='ortho', axis=0),
+                                               norm='ortho', axis=1)
+                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2][:, 0] *= np.sqrt(2)
+                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2][0, :] *= np.sqrt(2)
+    else:
+        for ii in range(n / blocksize):
+            for jj in range(n / blocksize):
+                i1 = ii
+                i2 = ii + blocksize
+                j1 = jj
+                j2 = jj + blocksize
+                # print(i1, i2, j1, j2)
+                # print('------------------------')
+                imsub = add_padding(image[i1:i2, j1:j2])
+                i2, j2 = imsub.shape
+
+                if norm in (None, 'ortho'):
+                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2] = dct(dct(imsub, norm=norm, axis=0),
+                                               norm=norm, axis=1)
+                else:
+                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2] = dct(dct(imsub, norm='ortho', axis=0),
+                                               norm='ortho', axis=1)
+                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2][:, 0] *= np.sqrt(2)
+                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2][0, :] *= np.sqrt(2)
+
+    return result
 
 
 def dct2d(image, blocksize=None, overlap=False, norm='isap'):
