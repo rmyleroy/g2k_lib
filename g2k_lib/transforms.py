@@ -14,7 +14,7 @@ import os
 IM_DCT_EXEC = os.path.abspath("./bin/im_dct")
 
 
-def new_dct2d(image, blockshape=None, overlap=False, norm='isap', pad=False):
+def dct2d(image, blockshape=None, overlap=False, norm='isap', pad=False):
     """
     Compute the 2D Discrete Cosine Transform (type 2) of an image.
 
@@ -31,17 +31,21 @@ def new_dct2d(image, blockshape=None, overlap=False, norm='isap', pad=False):
 
     NOTE: apparently norm=None has a problem. ??
     """
-    if norm not in [None, 'ortho', 'isap']:
+    if norm not in [None, "ortho", "isap"]:
         print("Warning: invalid norm --> using isap.")
-        norm = 'isap'
+        norm = "isap"
+    _norm = norm if norm in {None, "ortho"} else "ortho"
 
-    # Determine output shape
-    n, m = image.shape
+    if len(image.shape) == 2:
+        n, m = image.shape
+    else:
+        raise ValueError("image parameter must be a 2 dimension array. Got {}".format(len(image.shape)))
+    # print("(n, m)={}".format((n, m)))
 
-
+    # check blockshape validity
     if blockshape is not None:
         if type(blockshape) is int:
-            k = l = blockshape  # Length and height of the block
+            k = l = blockshape  # Length and height of the pixel block.
         elif type(blockshape) is tuple:
             if len(blockshape) == 1:
                 k = l = blockshape[0]
@@ -53,58 +57,53 @@ def new_dct2d(image, blockshape=None, overlap=False, norm='isap', pad=False):
             raise TypeError("blockshape parameter must be a tuple, not '{}'.".format(type(blockshape)))
         if type(k) is not int or type(l) is not int:
             raise TypeError("blockshape items must be integers. Got {}.".format(blockshape))
-
     else:
-        blocksize = (n, m)
+        k, l = n, m
+    # print("(k, l)={}".format((k, l)))
 
+    if (n % k != 0) or (m % l != 0):
+        raise ValueError("blockshape {} cannot divide the image {}.".format((k,l),(n,m)))
 
-    # Compute DCT on sub blocks
     if overlap:
-        for ii in range(2 * n / blocksize - 1):
-            for jj in range(2 * n / blocksize - 1):
-                i1 = ii * blocksize
-                j1 = jj * blocksize
-                # print(i1, i2, j1, j2)
-                # print(i1/2, i1/2 + blocksize, j1/2, j1/2 + blocksize)
-                # print('------------------------')
-                imsub = add_padding(image[i1 / 2:i1 / 2 + blocksize,
-                                          j1 / 2:j1 / 2 + blocksize])
-
-                i2, j2 = imsub.shape
-
-                if norm in (None, 'ortho'):
-                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2] = dct(dct(imsub, norm=norm, axis=0),
-                                               norm=norm, axis=1)
-                else:
-                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2] = dct(dct(imsub, norm='ortho', axis=0),
-                                               norm='ortho', axis=1)
-                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2][:, 0] *= np.sqrt(2)
-                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2][0, :] *= np.sqrt(2)
+        if (k % 2 != 0) or (l % 2 != 0):
+            raise ValueError("blockshape dimensions must be even when overlapping. Got {}.".format((k,l)))
+        rsample = 2 * n / k - 1  # number of vertical sample (rows).
+        csample = 2 * m / l - 1  # number of horizontal sample (columns).
     else:
-        for ii in range(n / blocksize):
-            for jj in range(n / blocksize):
-                i1 = ii
-                i2 = ii + blocksize
-                j1 = jj
-                j2 = jj + blocksize
-                # print(i1, i2, j1, j2)
-                # print('------------------------')
-                imsub = add_padding(image[i1:i2, j1:j2])
-                i2, j2 = imsub.shape
+        rsample = n / k
+        csample = m / l
 
-                if norm in (None, 'ortho'):
-                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2] = dct(dct(imsub, norm=norm, axis=0),
-                                               norm=norm, axis=1)
-                else:
-                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2] = dct(dct(imsub, norm='ortho', axis=0),
-                                               norm='ortho', axis=1)
-                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2][:, 0] *= np.sqrt(2)
-                    result[ii*i2:(ii+1)*i2, jj*j2:(jj+1)*j2][0, :] *= np.sqrt(2)
+    # print("rsample={}".format(rsample))
+    # print("csample={}".format(csample))
 
+    result_shape = (rsample * 2 * k, csample * 2 * l) if pad else (rsample * k, csample * l)
+    # print("result_shape={}".format(result_shape))
+    result = np.zeros(result_shape)
+
+    for rindex in range(rsample):  # row number
+        rpix = rindex * k/2 if overlap else rindex * k  # Minimum row index.
+        for cindex in range(csample):  # column number
+            cpix = cindex * l/2 if overlap else cindex * l  # Minimum column index.
+            # print("(rpix, cpix)={}".format((rpix, cpix)))
+
+            imblock = image[rpix:rpix + k, cpix:cpix + l]  # extract block related to the minimum indices and the block shape.
+            if pad:
+                imblock = add_padding(imblock)
+            kdct, ldct = imblock.shape  # Length and height of the dct block.
+            rdct = rindex * kdct
+            cdct = cindex * ldct
+
+            result[rdct: rdct+kdct, cdct: cdct + ldct] = dct(dct(imblock, norm=_norm, axis=0),norm=_norm, axis=1)
+            if norm == 'isap':
+                result[rdct: rdct+kdct, cdct: cdct + ldct][:, 0] *= np.sqrt(2)
+                result[rdct: rdct+kdct, cdct: cdct + ldct][0, :] *= np.sqrt(2)
+    # if norm == 'isap':
+    #     result[:,::ldct] *= np.sqrt(2)
+    #     result[::kdct,:] *= np.sqrt(2)
     return result
 
 
-def dct2d(image, blocksize=None, overlap=False, norm='isap'):
+def idct2d(image, blockshape=None, overlap=False, norm='isap', pad=False):
     """
     Compute the 2D Discrete Cosine Transform (type 2) of an image.
 
@@ -121,158 +120,81 @@ def dct2d(image, blocksize=None, overlap=False, norm='isap'):
 
     NOTE: apparently norm=None has a problem. ??
     """
-    if norm not in [None, 'ortho', 'isap']:
-        print("Warning: invalid norm --> using isap")
-        norm = 'isap'
+    if norm not in [None, "ortho", "isap"]:
+        print("Warning: invalid norm --> using isap.")
+        norm = "isap"
+    _norm = norm if norm in {None, "ortho"} else "ortho"
 
-    # Determine output shape
-    n = image.shape[0]
-    if blocksize is not None:
-        if blocksize == n:
-            result = np.zeros_like(image)
-        elif blocksize not in [n / 2, n / 4, n / 8]:
-            print("Warning: invalid blocksize --> using {}".format(n))
-            blocksize = n
-            result = np.zeros_like(image)
-        else:
-            if overlap:
-                size = 2 * n - blocksize
-                result = np.zeros((size, size))
+    if len(image.shape) == 2:
+        n, m = image.shape
+    else:
+        raise ValueError("image parameter must be a 2 dimension array. Got {}".format(len(image.shape)))
+    # print("(n, m)={}".format((n, m)))
+
+    # check blockshape validity
+    if blockshape is not None:
+        if type(blockshape) is int:
+            k = l = blockshape  # Length and height of the pixel block.
+        elif type(blockshape) is tuple:
+            if len(blockshape) == 1:
+                k = l = blockshape[0]
+            elif len(blockshape) == 2:
+                k, l = blockshape
             else:
-                result = np.zeros_like(image)
-    else:
-        blocksize = n
-        result = np.zeros_like(image)
-
-    # Compute DCT on sub blocks
-    if overlap:
-        for ii in range(2 * n / blocksize - 1):
-            for jj in range(2 * n / blocksize - 1):
-                i1 = ii * blocksize
-                i2 = i1 + blocksize
-                j1 = jj * blocksize
-                j2 = j1 + blocksize
-                # print(i1, i2, j1, j2)
-                # print(i1/2, i1/2 + blocksize, j1/2, j1/2 + blocksize)
-                # print('------------------------')
-                imsub = image[i1 / 2:i1 / 2 + blocksize,
-                              j1 / 2:j1 / 2 + blocksize]
-                if norm in (None, 'ortho'):
-                    result[i1:i2, j1:j2] = dct(dct(imsub, norm=norm, axis=0),
-                                               norm=norm, axis=1)
-                else:
-                    result[i1:i2, j1:j2] = dct(dct(imsub, norm='ortho', axis=0),
-                                               norm='ortho', axis=1)
-                    result[i1:i2, j1:j2][:, 0] *= np.sqrt(2)
-                    result[i1:i2, j1:j2][0, :] *= np.sqrt(2)
-    else:
-        for ii in range(0, n, blocksize):
-            for jj in range(0, n, blocksize):
-                i1 = ii
-                i2 = ii + blocksize
-                j1 = jj
-                j2 = jj + blocksize
-                # print(i1, i2, j1, j2)
-                # print('------------------------')
-                imsub = image[i1:i2, j1:j2]
-                if norm in (None, 'ortho'):
-                    result[i1:i2, j1:j2] = dct(dct(imsub, norm=norm, axis=0),
-                                               norm=norm, axis=1)
-                else:
-                    result[i1:i2, j1:j2] = dct(dct(imsub, norm='ortho', axis=0),
-                                               norm='ortho', axis=1)
-                    result[i1:i2, j1:j2][:, 0] *= np.sqrt(2)
-                    result[i1:i2, j1:j2][0, :] *= np.sqrt(2)
-
-    return result
-
-
-def idct2d(image, blocksize=None, overlap=False, norm="isap"):
-    """
-    Compute the inverse 2D Discrete Cosine Transform (type 2) of an image.
-
-    Parameters
-    ----------
-    image : 2d-array
-        Image to transform.
-    norm : {None, 'ortho', 'isap'}, optional
-        Normalization option for `scipy.fftpack.idct`. Default is 'isap'.
-    blocksize : int, optional
-        TODO
-    overlap : bool, optional
-        TODO
-
-    NOTE: apparently norm=None has a problem.
-    """
-    if norm not in [None, 'ortho', 'isap']:
-        print("Warning: invalid norm --> using isap")
-        norm = 'isap'
-
-    # Determine output shape
-    n = image.shape[0]
-    if blocksize is not None:
-        if blocksize == n:
-            result = np.zeros_like(image)
+                raise ValueError("Length of blockshape parameter cannot exceed 3. Got {}.".format(len(blockshape)))
         else:
-            if overlap:
-                size = (n + blocksize) / 2
-                result = np.zeros((size, size))
-            else:
-                result = np.zeros_like(image)
+            raise TypeError("blockshape parameter must be a tuple, not '{}'.".format(type(blockshape)))
+        if type(k) is not int or type(l) is not int:
+            raise TypeError("blockshape items must be integers. Got {}.".format(blockshape))
     else:
-        blocksize = n
-        result = np.zeros_like(image)
+        if pad:
+            k, l = n/2, m/2
+        else:
+            k, l = n, m
+    # print("(k, l)={}".format((k, l)))
 
-    # Compute inverse DCT on sub blocks
+    kdct = 2*k if pad else k
+    ldct = 2*l if pad else l
+    # print("(kdct, ldct)={}".format((kdct, ldct)))
+
+    if (n % kdct != 0) or (m % ldct != 0):
+        raise ValueError("blockdct shape {} cannot divide the image {}.".format((kdct,ldct),(n,m)))
+
+    rsample = n / kdct  # number of vertical sample (rows).
+    csample = m / ldct   # number of horizontal sample (columns).
+
+    # print("rsample={}".format(rsample))
+    # print("csample={}".format(csample))
     if overlap:
-        for ii in range(n / blocksize):
-            for jj in range(n / blocksize):
-                i1 = ii * blocksize
-                i2 = i1 + blocksize
-                j1 = jj * blocksize
-                j2 = j1 + blocksize
-                i1r = i1 / 2
-                i2r = i1r + blocksize
-                j1r = j1 / 2
-                j2r = j1r + blocksize
-                # print(i1, i2, j1, j2)
-                # print(i1r, i2r, j1r, j2r)
-                # print('------------------------')
-                imsub = image[i1:i2, j1:j2]
-                if norm == 'isap':
-                    imsub[:, 0] /= np.sqrt(2)
-                    imsub[0, :] /= np.sqrt(2)
-                    result[i1r:i2r, j1r:j2r] += idct(idct(imsub, norm='ortho', axis=0),
-                                                     norm='ortho', axis=1)
-
-                else:
-                    result[i1r:i2r, j1r:j2r] += idct(idct(imsub, norm=norm, axis=0),
-                                                     norm=norm, axis=1)
-        # Take averages
-        step = blocksize / 2
-        counts = np.ones_like(result)
-        counts[step:-step, :step] = 2
-        counts[step:-step, -step:] = 2
-        counts[:step, step:-step] = 2
-        counts[-step:, step:-step] = 2
-        counts[step:-step, step:-step] = 4
-        result /= counts
+        if (k % 2 != 0) or (l % 2 != 0):
+            raise ValueError("blockshape dimensions must be even when overlapping. Got {}.".format((k,l)))
+        result_shape = ((rsample+1)*k/2, (csample+1)*l/2)
     else:
-        for ii in range(0, n, blocksize):
-            for jj in range(0, n, blocksize):
-                i1 = ii
-                i2 = ii + blocksize
-                j1 = jj
-                j2 = jj + blocksize
-                imsub = image[i1:i2, j1:j2]
-                if norm == 'isap':
-                    imsub[:, 0] /= np.sqrt(2)
-                    imsub[0, :] /= np.sqrt(2)
-                    result[i1:i2, j1:j2] = idct(idct(imsub, norm='ortho', axis=0),
-                                                norm='ortho', axis=1)
-                else:
-                    result[i1:i2, j1:j2] = idct(idct(imsub, norm=norm, axis=0),
-                                                norm=norm, axis=1)
+        result_shape = (rsample*k, csample*l)
+    # print("result_shape={}".format(result_shape))
+    result = np.zeros(result_shape)
+
+    for rindex in range(rsample):  # row number
+        rdct = rindex * kdct
+        rpix = rindex * k/2 if overlap else rindex * k  # Minimum row index.
+        for cindex in range(csample):  # column number
+            cdct = cindex * ldct
+            cpix = cindex * l/2 if overlap else cindex * l  # Minimum column index.
+            # print("(rpix, cpix)={}".format((rpix, cpix)))
+            # print("(rdct, cdct)={}".format((rdct, cdct)))
+
+            imblock = image[rdct:rdct + kdct, cdct:cdct + ldct]  # extract block related to the minimum indices and the block shape.
+            if norm == 'isap':
+                imblock[:, 0] /= np.sqrt(2)
+                imblock[0, :] /= np.sqrt(2)
+            imblock = idct(idct(imblock, norm=_norm, axis=0),norm=_norm, axis=1)
+            if pad:
+                imblock = remove_padding(imblock)
+
+            result[rpix: rpix+k, cpix: cpix + l] += imblock
+    if overlap:
+        result[k/2:-k/2] /= 2
+        result[:,l/2:-l/2] /= 2
 
     return result
 
@@ -292,7 +214,7 @@ def soft_threshold(array, value):
     array -= np.sign(array) * value
 
 
-def filtering(signal, threshold, block_size=None, overlap=False, norm=0):
+def filtering(signal, threshold, block_size=None, overlap=False, norm=0, pad=False):
     """
     This method return the input signal after its DCT components have been filtered.
     """
@@ -300,15 +222,15 @@ def filtering(signal, threshold, block_size=None, overlap=False, norm=0):
     block_size_max = signal.shape[0]
     if not block_size:
         block_size = block_size_max
-    alpha = dct2d(signal, block_size, overlap)
+    alpha = dct2d(signal, blockshape=block_size, overlap=overlap, norm='isap', pad=pad)
+    dct_block = 2 * block_size if pad else block_size
     th_alpha = alpha
     if norm == 0:
         hard_threshold(th_alpha, threshold)
     if norm == 1:
         soft_threshold(th_alpha, threshold)
-    th_alpha[::block_size, ::block_size] = alpha[::block_size,
-                                                 ::block_size]  # Keep the 0 frequency component for each block
-    return idct2d(th_alpha, block_size, overlap)
+    th_alpha[::dct_block,::dct_block] = alpha[::dct_block,::dct_block]  # Keep the 0 frequency component for each block
+    return idct2d(th_alpha, blockshape=block_size, overlap=overlap, norm='isap', pad=pad)
 
 
 def get_threshold_n_lin(n, Niter, th_max, th_min):
