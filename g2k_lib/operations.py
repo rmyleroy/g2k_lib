@@ -49,7 +49,7 @@ def next_step_gradient(kE, kB, g1map, g2map, mask, reduced):
     if reduced:
         # Residuals using reduced shear
         r1 = (g1map * (1 - kE) - g1) * mask
-        r2 = (g2map * (1 - kB) - g2) * mask
+        r2 = (g2map * (1 - kE) - g2) * mask
     else:
         # Residuals using observed shear
         r1 = (g1map - g1) * mask
@@ -118,7 +118,7 @@ def iterative(g1map, g2map, mask, Niter=1, bpix="None", relaxed=False, relax_typ
             if i == 1:
                 # The maximum value of the DCT transform of the E-mode kappa map
                 # is used as the maximum threshold value
-                max_threshold = np.max(dct2d(kE))
+                max_threshold = np.max(dct2d(kE, block_size, overlap=overlap))
                 min_threshold = 0
             # dct_kE = kE if no_pad else remove_padding(kE)
             # print("kE: {}".format(kE.shape))
